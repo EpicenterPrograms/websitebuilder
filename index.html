@@ -33,7 +33,10 @@
                     html += "        </p>\n";
                     html += "    </body>\n";
                     html += "</html>\n";
+                    getTag("textarea")[0].readOnly = false;
                     getTag("textarea")[0].value = html;
+                    getTag("textarea")[0].readOnly = true;
+                    // For some reason, line breaks aren't preserved when a textarea is read-only.
                 });
             });
         </script>
@@ -56,6 +59,6 @@
         </button>
         <br>
         <br>
-        <textarea cols="60" rows="10" readonly="true"></textarea>
+        <textarea cols="60" rows="10" readonly></textarea>
     </body>
 </html>
