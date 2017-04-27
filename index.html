@@ -7,6 +7,13 @@
         <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
         <script>
             onLoad(function() {
+                getId("advanced").addEventListener("click", function() {
+                    if (this.checked) {
+                        getTag("textarea")[0].readOnly = false;
+                    } else {
+                        getTag("textarea")[0].readOnly = true;
+                    }
+                });
                 getId("finish").addEventListener("click", function() {
                     var html = "";
                     function tabs(number) {
@@ -37,6 +44,10 @@
         </style>
     </head>
     <body>
+        <input type="checkbox" id="advanced">
+        <label for="advanced">Advanced</label>
+        <br>
+        <br>
         <input type="text" placeholder="Title" id="title">
         <br>
         <br>
@@ -45,6 +56,6 @@
         </button>
         <br>
         <br>
-        <textarea cols="60" rows="10"></textarea>
+        <textarea cols="60" rows="10" readonly></textarea>
     </body>
 </html>
