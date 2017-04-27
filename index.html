@@ -33,7 +33,7 @@
                     html += "        </p>\n";
                     html += "    </body>\n";
                     html += "</html>\n";
-                    getId("preview").innerHTML = html;
+                    getId("preview").contentWindow.document.write(html);
                     getTag("textarea")[0].value = html;
                 });
                 getId("startOver").addEventListener("click", function() {
