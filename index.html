@@ -7,27 +7,34 @@
         <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
         <script>
             onLoad(function() {
-                var html = "";
-                function tabs(number) {
-                    return "    ".repeat(number);
-                }
-                html += "<!DOCTYPE html>\n";
-                html += "<html>\n";
-                html += "    <head>\n";
-                html += "        <title>\n";
-                html += tabs(3) + getId("title").value + "\n";
-                html += "        </title>\n";
-                html += '        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></' + 'script>\n';
-                html += "    </head>\n";
-                html += "    <body>\n";
-                html += "        <p>\n";
-                html += tabs(3) + "Put your content here.\n";
-                html += "        </p>\n";
-                html += "    </body>\n";
-                html += "</html>\n";
-                getTag("textarea")[0].value = html;
+                getId("finish").addEventListener("click", function() {
+                    var html = "";
+                    function tabs(number) {
+                        return "    ".repeat(number);
+                    }
+                    html += "<!DOCTYPE html>\n";
+                    html += "<html>\n";
+                    html += "    <head>\n";
+                    html += "        <title>\n";
+                    html += tabs(3) + getId("title").value + "\n";
+                    html += "        </title>\n";
+                    html += '        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></' + 'script>\n';
+                    html += "    </head>\n";
+                    html += "    <body>\n";
+                    html += "        <p>\n";
+                    html += tabs(3) + "Put your content here.\n";
+                    html += "        </p>\n";
+                    html += "    </body>\n";
+                    html += "</html>\n";
+                    getTag("textarea")[0].value = html;
+                });
             });
         </script>
+        <style>
+            textarea {
+                white-space: nowrap;
+            }
+        </style>
     </head>
     <body>
         <input type="text" placeholder="Title" id="title">
