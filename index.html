@@ -33,10 +33,12 @@
                     html += "        </p>\n";
                     html += "    </body>\n";
                     html += "</html>\n";
+                    getId("preview").innerHTML = html;
                     getTag("textarea")[0].value = html;
                 });
                 getId("startOver").addEventListener("click", function() {
                     getId("title").value = "";
+                    getId("preview").innerHTML = "";
                     getTag("textarea")[0].value = "";
                 });
             });
@@ -64,6 +66,12 @@
         <button id="finish">
             Finish
         </button>
+        <br>
+        <br>
+        <p>
+            Preview:
+        </p>
+        <iframe id="preview"></iframe>
         <br>
         <br>
         <textarea cols="60" rows="10"></textarea>
