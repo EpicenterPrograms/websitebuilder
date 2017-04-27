@@ -5,8 +5,39 @@
             Website Builder
         </title>
         <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
+        <script>
+            onLoad(function() {
+                var html = "";
+                function tabs(number) {
+                    return "    ".repeat(number);
+                }
+                html += "<!DOCTYPE html>\n";
+                html += "<html>\n";
+                html += "    <head>\n";
+                html += "        <title>\n";
+                html += tabs(3) + getId("title").value + "\n";
+                html += "        </title>\n";
+                html += '        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></' + 'script>\n';
+                html += "    </head>\n";
+                html += "    <body>\n";
+                html += "        <p>\n";
+                html += tabs(3) + "Put your content here.\n";
+                html += "        </p>\n";
+                html += "    </body>\n";
+                html += "</html>\n";
+                getTag("textarea")[0].value = html;
+            });
+        </script>
     </head>
     <body>
+        <input type="text" placeholder="Title" id="title">
+        <br>
+        <br>
+        <button id="finish">
+            Finish
+        </button>
+        <br>
+        <br>
         <textarea cols="60" rows="10"></textarea>
     </body>
 </html>
