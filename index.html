@@ -9,9 +9,9 @@
             onLoad(function() {
                 getId("advanced").addEventListener("click", function() {
                     if (this.checked) {
-                        getTag("textarea")[0].readOnly = false;
+                        
                     } else {
-                        getTag("textarea")[0].readOnly = true;
+                        
                     }
                 });
                 getId("finish").addEventListener("click", function() {
@@ -33,10 +33,11 @@
                     html += "        </p>\n";
                     html += "    </body>\n";
                     html += "</html>\n";
-                    getTag("textarea")[0].readOnly = false;
                     getTag("textarea")[0].value = html;
-                    getTag("textarea")[0].readOnly = true;
-                    // For some reason, line breaks aren't preserved when a textarea is read-only.
+                });
+                getId("startOver").addEventListener("click", function() {
+                    getId("title").value = "";
+                    getTag("textarea")[0].value = "";
                 });
             });
         </script>
@@ -59,6 +60,11 @@
         </button>
         <br>
         <br>
-        <textarea cols="60" rows="10" readonly></textarea>
+        <textarea cols="60" rows="10"></textarea>
+        <br>
+        <br>
+        <button id="startOver">
+            Start over
+        </button>
     </body>
 </html>
