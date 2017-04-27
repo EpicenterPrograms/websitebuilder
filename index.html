@@ -45,14 +45,20 @@
             textarea {
                 white-space: nowrap;
             }
+            .necessary {
+                border: .05em solid red;
+            }
         </style>
     </head>
     <body>
+        <p>
+            Enter specifications for your website. Necessary fields are indicated in red.
+        </p>
         <input type="checkbox" id="advanced">
         <label for="advanced">Advanced</label>
         <br>
         <br>
-        <input type="text" placeholder="Title" id="title">
+        <input type="text" placeholder="Title" class="necessary" id="title">
         <br>
         <br>
         <button id="finish">
