@@ -1,45 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html class="htmlClass">
     <head>
         <title>
             Website Builder
         </title>
-        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
         <script>
-            onLoad(function() {
-                getId("advanced").addEventListener("click", function() {
+            var Standards = {"simplification" : true};
+        </script>
+        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
+        <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>
+        <script>
+            S.onLoad(function() {
+                S.getId("advanced").addEventListener("click", function() {
                     if (this.checked) {
                         
                     } else {
                         
                     }
                 });
-                getId("finish").addEventListener("click", function() {
+                S.getId("finish").addEventListener("click", function() {
                     var html = "";
                     function tabs(number) {
                         return "    ".repeat(number);
                     }
-                    html += "<!DOCTYPE html>\n";
-                    html += "<html>\n";
-                    html += "    <head>\n";
-                    html += "        <title>\n";
-                    html += tabs(3) + getId("title").value + "\n";
-                    html += "        </title>\n";
+                    html += '<!DOCTYPE html>\n';
+                    html += '<html class="htmlClass">\n';
+                    html += '    <head>\n';
+                    html += '        <title>\n';
+                    html += tabs(3) + S.getId("title").value + '\n';
+                    html += '        </title>\n';
                     html += '        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></' + 'script>\n';
-                    html += "    </head>\n";
-                    html += "    <body>\n";
-                    html += "        <p>\n";
-                    html += tabs(3) + "Put your content here.\n";
-                    html += "        </p>\n";
-                    html += "    </body>\n";
-                    html += "</html>\n";
-                    getId("preview").contentWindow.document.write(html);
-                    getTag("textarea")[0].value = html;
+                    html += '        <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>\n';
+                    html += '    </head>\n';
+                    html += '    <body>\n';
+                    html += '        <h1 class="mainTitle">\n';
+                    html += tabs(3) + S.getId("title").value + '\n';
+                    html += '        </h1>\n';
+                    html += '        <section>\n';
+                    html += tabs(3) + '<p>\n';
+                    html += tabs(4) + 'Put your content here.\n';
+                    html += tabs(3) + '</p>\n';
+                    html += '        </section>\n';
+                    html += '    </body>\n';
+                    html += '</html>\n';
+                    S.getId("preview").contentWindow.document.write(html);
+                    S.getTag("textarea")[0].value = html;
                 });
-                getId("startOver").addEventListener("click", function() {
-                    getId("title").value = "";
-                    getId("preview").innerHTML = "";
-                    getTag("textarea")[0].value = "";
+                S.getId("startOver").addEventListener("click", function() {
+                    S.getId("title").value = "";
+                    S.getId("preview").innerHTML = "";
+                    S.getTag("textarea")[0].value = "";
                 });
             });
         </script>
@@ -53,30 +63,35 @@
         </style>
     </head>
     <body>
-        <p>
-            Enter specifications for your website. Necessary fields are indicated in red.
-        </p>
-        <input type="checkbox" id="advanced">
-        <label for="advanced">Advanced</label>
-        <br>
-        <br>
-        <input type="text" placeholder="Title" class="necessary" id="title">
-        <br>
-        <br>
-        <button id="finish">
-            Finish
-        </button>
-        <br>
-        <br>
-        <p style="display:none">
-            Preview:
-        </p>
-        <iframe id="preview" style="display:none"></iframe>
-        <textarea cols="60" rows="10"></textarea>
-        <br>
-        <br>
-        <button id="startOver">
-            Start over
-        </button>
+        <h1 class="mainTitle">
+            Website Builder
+        </h1>
+        <section>
+            <p>
+                Enter specifications for your website. Necessary fields are indicated in red.
+            </p>
+            <input type="checkbox" id="advanced">
+            <label for="advanced">Advanced</label>
+            <br>
+            <br>
+            <input type="text" placeholder="Title" class="necessary" id="title">
+            <br>
+            <br>
+            <button id="finish">
+                Finish
+            </button>
+            <br>
+            <br>
+            <p style="display:none">
+                Preview:
+            </p>
+            <iframe id="preview" style="display:none"></iframe>
+            <textarea cols="60" rows="10"></textarea>
+            <br>
+            <br>
+            <button id="startOver">
+                Start over
+            </button>
+        </section>
     </body>
 </html>
