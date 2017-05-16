@@ -5,10 +5,10 @@
             Website Builder
         </title>
         <script>
-            var Standards = {"simplification" : true};
+            var Standards = {};
+            Standards.options = {"simplification" : true};
         </script>
         <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
-        <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>
         <script>
             S.onLoad(function() {
                 S.getId("advanced").addEventListener("click", function() {
@@ -53,6 +53,7 @@
                 });
             });
         </script>
+        <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>
         <style>
             textarea {
                 white-space: nowrap;
