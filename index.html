@@ -24,6 +24,9 @@
                         return "    ".repeat(number);
                     }
                     html += '<!DOCTYPE html>\n';
+                    if (S.getId("copyCode").checked) {
+                        html += '<!--  -->\n';
+                    }
                     html += '<html class="htmlClass">\n';
                     html += '    <head>\n';
                     html += '        <title>\n';
@@ -36,6 +39,14 @@
                     html += '        <h1 class="mainTitle">\n';
                     html += tabs(3) + S.getId("title").value + '\n';
                     html += '        </h1>\n';
+                    if (S.getId("signIn").checked) {
+                        html += '        <div class="login">\n';
+                        html += tabs(3) + '<button id="loginButton">\n';
+                        html += tabs(4) + 'Log in\n';
+                        html += tabs(3) + '</button>\n';
+                        html += tabs(3) + '<input type="text" placeholder="Password" id="loginText"/>\n';
+                        html += '        </div>\n';
+                    }
                     html += '        <section>\n';
                     html += tabs(3) + '<p>\n';
                     html += tabs(4) + 'Put your content here.\n';
@@ -47,7 +58,9 @@
                     S.getTag("textarea")[0].value = html;
                 });
                 S.getId("startOver").addEventListener("click", function() {
-                    S.getId("title").value = "";
+                    ["advanced", "title", "signIn", "copyCode"].forEach(function(ID) {
+                        S.getId(ID).value = "";
+                    });
                     S.getId("preview").innerHTML = "";
                     S.getTag("textarea")[0].value = "";
                 });
@@ -57,6 +70,7 @@
         <style>
             textarea {
                 white-space: nowrap;
+                font-family: monospace;
             }
             .necessary {
                 border: .05em solid red;
@@ -71,11 +85,19 @@
             <p>
                 Enter specifications for your website. Necessary fields are indicated in red.
             </p>
-            <input type="checkbox" id="advanced">
+            <input type="checkbox" id="advanced"/>
             <label for="advanced">Advanced</label>
             <br>
             <br>
-            <input type="text" placeholder="Title" class="necessary" id="title">
+            <input type="text" placeholder="Title" class="necessary" id="title"/>
+            <br>
+            <br>
+            <input type="checkbox" id="signIn"/>
+            <label for="signIn">Log-in section</label>
+            <br>
+            <br>
+            <input type="checkbox" id="copyCode"/>
+            <label for="copyCode">Replication code</label>
             <br>
             <br>
             <button id="finish">
@@ -83,10 +105,10 @@
             </button>
             <br>
             <br>
-            <p style="display:none">
+            <p>
                 Preview:
             </p>
-            <iframe id="preview" style="display:none"></iframe>
+            <iframe id="preview"></iframe>
             <textarea cols="60" rows="10"></textarea>
             <br>
             <br>
