@@ -58,7 +58,10 @@
                     S.getTag("textarea")[0].value = html;
                 });
                 S.getId("startOver").addEventListener("click", function() {
-                    ["advanced", "title", "signIn", "copyCode"].forEach(function(ID) {
+                    ["advanced", "signIn", "copyCode"].forEach(function(ID) {
+                        S.getId(ID).checked = false;
+                    });
+                    ["title"].forEach(function(ID) {
                         S.getId(ID).value = "";
                     });
                     S.getId("preview").innerHTML = "";
@@ -109,7 +112,9 @@
                 Preview:
             </p>
             <iframe id="preview"></iframe>
-            <textarea cols="60" rows="10"></textarea>
+            <br>
+            <br>
+            <textarea cols="50" rows="10"></textarea>
             <br>
             <br>
             <button id="startOver">
