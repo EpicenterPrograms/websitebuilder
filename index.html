@@ -10,73 +10,117 @@
         </script>
         <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
         <script>
-            S.onLoad(function() {
-                S.getId("advanced").addEventListener("click", function() {
-                    if (this.checked) {
-                        
-                    } else {
-                        
-                    }
-                });
-                S.getId("finish").addEventListener("click", function() {
-                    var html = "";
-                    function tabs(number) {
-                        return "    ".repeat(number);
-                    }
-                    html += '<!DOCTYPE html>\n';
-                    if (S.getId("copyCode").checked) {
-                        html += '<!--  -->\n';
-                    }
-                    html += '<html class="htmlClass">\n';
-                    html += '    <head>\n';
-                    html += '        <title>\n';
-                    html += tabs(3) + S.getId("title").value + '\n';
-                    html += '        </title>\n';
-                    html += '        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></' + 'script>\n';
-                    html += '        <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>\n';
-                    html += '    </head>\n';
+            S.listen("advanced", "click", function() {
+                if (this.innerHTML == "Show advanced choices") {
+                    S.getId("advancedSection").style.display = "inline-block";
+                    this.innerHTML = "Hide advanced choices";
+                } else {
+                    S.getId("advancedSection").style.display = "none";
+                    this.innerHTML = "Show advanced choices";
+                }
+            });
+            S.listen("navigation", "click", function() {
+                if (this.checked) {
+                    S.getId("navigationSection").style.display = "inline-block";
+                } else {
+                    S.getId("navigationSection").style.display = "none";
+                }
+            });
+            S.listen("finish", "click", function() {
+                var html = "";
+                function tabs(number) {
+                    return "    ".repeat(number);
+                }
+                html += '<!DOCTYPE html>\n';
+                html += '<!-- made with Epicenter website builder -->\n';
+                html += '<html class="html-class">\n';
+                html += '    <head>\n';
+                html += '        <title>\n';
+                html += tabs(3) + S.getId("title").value + '\n';
+                html += '        </title>\n';
+                if (S.getId("navSource").value) {
+                    html += '        <script>\n';
+                    html += tabs(3) + 'var Standards = {};\n';
+                    html += tabs(3) + 'Standards.options = {\n';
+                    html += tabs(4) + '"navigation": "' + S.getId("navSource").value + '"\n';
+                    html += tabs(3) + '};\n';
+                    html += '        </' + 'script>\n';
+                }
+                html += '        <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></' + 'script>\n';
+                html += '        <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>\n';
+                html += '    </head>\n';
+                if (S.getName("navChoice", true).id == "leftNav") {
+                    html += '    <body class="left-nav">\n';
+                    html += '        <nav class="left-nav"></nav>\n';
+                } else {
                     html += '    <body>\n';
-                    html += '        <h1 class="mainTitle">\n';
-                    html += tabs(3) + S.getId("title").value + '\n';
-                    html += '        </h1>\n';
-                    if (S.getId("signIn").checked) {
-                        html += '        <div class="login">\n';
-                        html += tabs(3) + '<button id="loginButton">\n';
-                        html += tabs(4) + 'Log in\n';
-                        html += tabs(3) + '</button>\n';
-                        html += tabs(3) + '<input type="text" placeholder="Password" id="loginText"/>\n';
-                        html += '        </div>\n';
-                    }
-                    html += '        <section>\n';
-                    html += tabs(3) + '<p>\n';
-                    html += tabs(4) + 'Put your content here.\n';
-                    html += tabs(3) + '</p>\n';
-                    html += '        </section>\n';
-                    html += '    </body>\n';
-                    html += '</html>\n';
-                    S.getId("preview").contentWindow.document.write(html);
-                    S.getTag("textarea")[0].value = html;
+                }
+                if (S.getName("navChoice", true).id == "hiddenLeftNav") {
+                    html += '        <div class="darkener"></div>\n';
+                    html += '        <nav class="hidden-left-nav"></nav>\n';
+                    html += '        <div class="nav-tab"></div>\n';
+                }
+                if (S.getId("signIn").checked) {
+                    html += '        <div class="login-section">\n';
+                    html += tabs(3) + '<button id="loginButton">\n';
+                    html += tabs(4) + 'Log in\n';
+                    html += tabs(3) + '</button>\n';
+                    html += tabs(3) + '<input type="text" placeholder="Password" id="loginText"/>\n';
+                    html += '        </div>\n';
+                }
+                html += '        <h1 class="main-title">\n';
+                html += tabs(3) + S.getId("title").value + '\n';
+                html += '        </h1>\n';
+                if (S.getName("navChoice", true).id == "topNav") {
+                    html += '        <nav class="top-nav"></nav>\n';
+                }
+                html += '        <section>\n';
+                html += tabs(3) + '<p>\n';
+                html += tabs(4) + 'Put your content here.\n';
+                html += tabs(3) + '</p>\n';
+                html += '        </section>\n';
+                html += '    </body>\n';
+                html += '</html>\n';
+                S.getId("preview").contentWindow.document.write(html);
+                S.getTag("textarea")[0].value = html;
+            });
+            S.listen("startOver", "click", function() {
+                ["navigation", "leftNav", "hiddenLeftNav", "topNav"].forEach(function(ID) {
+                    S.getId(ID).checked = false;
                 });
-                S.getId("startOver").addEventListener("click", function() {
-                    ["advanced", "signIn", "copyCode"].forEach(function(ID) {
-                        S.getId(ID).checked = false;
-                    });
-                    ["title"].forEach(function(ID) {
-                        S.getId(ID).value = "";
-                    });
-                    S.getId("preview").innerHTML = "";
-                    S.getTag("textarea")[0].value = "";
+                S.getId("signIn").checked = true;
+                ["title", "copier"].forEach(function(ID) {
+                    S.getId(ID).value = "";
                 });
+                S.getId("preview").innerHTML = "";
+                S.getTag("textarea")[0].value = "";
             });
         </script>
         <link rel="stylesheet" href="https://coolprogramminguser.github.io/Standards/formatting.css"/>
         <style>
+            button {
+                display: block;
+                margin: 1em auto;
+            }
             textarea {
                 white-space: nowrap;
                 font-family: monospace;
             }
-            .necessary {
-                border: .05em solid red;
+            input[type="text"] {
+                display: block;
+                margin: 1em auto;
+            }
+            .group {
+                display: none;
+                border: .05em solid #00aaee;
+                padding: .5em;
+            }
+            .block {
+                display: block;
+            }
+            .necessary::after {
+                content: "*";
+                color: red;
             }
         </style>
     </head>
@@ -86,23 +130,38 @@
         </h1>
         <section>
             <p>
-                Enter specifications for your website. Necessary fields are indicated in red.
+                Enter specifications for your website. Necessary fields have a red asterisk.
             </p>
-            <input type="checkbox" id="advanced"/>
-            <label for="advanced">Advanced</label>
-            <br>
-            <br>
             <input type="text" placeholder="Title" class="necessary" id="title"/>
-            <br>
-            <br>
-            <input type="checkbox" id="signIn"/>
-            <label for="signIn">Log-in section</label>
-            <br>
-            <br>
-            <input type="checkbox" id="copyCode"/>
-            <label for="copyCode">Replication code</label>
-            <br>
-            <br>
+            <input type="checkbox" id="navigation"/>
+            <label for="navigation">Navigation section</label>
+            <div class="block">
+                <div class="group" id="navigationSection">
+                    <input type="text" placeholder="Navigation source" id="navSource"/>
+                    <input type="radio" name="navChoice" id="leftNav"/>
+                    <label for="leftNav">Left positioned contents</label>
+                    <br>
+                    <br>
+                    <input type="radio" name="navChoice" id="hiddenLeftNav"/>
+                    <label for="hiddenLeftNav">Hidden contents on the left</label>
+                    <br>
+                    <br>
+                    <input type="radio" name="navChoice" id="topNav"/>
+                    <label for="topNav">Contents on the top of the page</label>
+                </div>
+            </div>
+            <button id="advanced">
+                Show advanced choices
+            </button>
+            <div class="block">
+                <div class="group" id="advancedSection">
+                    <input type="text" placeholder="Enter a replication code" id="copier"/>
+                    <br>
+                    <br>
+                    <input type="checkbox" id="signIn" checked/>
+                    <label for="signIn">Log-in section</label>
+                </div>
+            </div>
             <button id="finish">
                 Finish
             </button>
