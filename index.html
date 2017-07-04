@@ -11,7 +11,7 @@
         <script src="https://coolprogramminguser.github.io/Standards/behavior.js"></script>
         <script>
             S.listen("advanced", "click", function() {
-                if (this.innerHTML == "Show advanced choices") {
+                if (this.innerHTML.trim() == "Show advanced choices") {
                     S.getId("advancedSection").style.display = "inline-block";
                     this.innerHTML = "Hide advanced choices";
                 } else {
@@ -85,7 +85,7 @@
                 S.getTag("textarea")[0].value = html;
             });
             S.listen("startOver", "click", function() {
-                ["navigation", "leftNav", "hiddenLeftNav", "topNav"].forEach(function(ID) {
+                [/*"navigation", "leftNav", "hiddenLeftNav", "topNav"*/].forEach(function(ID) {
                     S.getId(ID).checked = false;
                 });
                 S.getId("signIn").checked = true;
