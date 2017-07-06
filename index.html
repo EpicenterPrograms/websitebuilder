@@ -74,11 +74,11 @@
                 if (S.getName("navChoice", true).id == "topNav") {
                     html += '        <nav class="top-nav"></nav>\n';
                 }
-                html += '        <section>\n';
+                html += '        <main>\n';
                 html += tabs(3) + '<p>\n';
                 html += tabs(4) + 'Put your content here.\n';
                 html += tabs(3) + '</p>\n';
-                html += '        </section>\n';
+                html += '        </main>\n';
                 html += '    </body>\n';
                 html += '</html>\n';
                 S.getId("preview").contentWindow.document.write(html);
@@ -128,7 +128,7 @@
         <h1 class="main-title">
             Website Builder
         </h1>
-        <section>
+        <main>
             <p>
                 Enter specifications for your website. Necessary fields have a red asterisk.
             </p>
@@ -177,6 +177,6 @@
             <button id="startOver">
                 Start over
             </button>
-        </section>
+        </main>
     </body>
 </html>
