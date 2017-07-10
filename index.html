@@ -56,9 +56,7 @@
                     html += '    <body>\n';
                 }
                 if (S.getName("navChoice", true).id == "hiddenLeftNav") {
-                    html += '        <div class="darkener"></div>\n';
                     html += '        <nav class="hidden-left-nav"></nav>\n';
-                    html += '        <div class="nav-tab"></div>\n';
                 }
                 if (S.getId("signIn").checked) {
                     html += '        <div class="login-section">\n';
@@ -171,7 +169,7 @@
             <iframe id="preview"></iframe>
             <br>
             <br>
-            <textarea cols="50" rows="10"></textarea>
+            <textarea cols="50" rows="10" readonly></textarea>
             <br>
             <br>
             <button id="startOver">
