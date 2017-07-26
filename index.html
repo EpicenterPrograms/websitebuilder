@@ -60,12 +60,9 @@
                     html += '        <nav class="hidden-left-nav"></nav>\n';
                 }
                 if (S.getId("signIn").checked) {
-                    html += '        <div class="login-section">\n';
-                    html += tabs(3) + '<button id="loginButton">\n';
-                    html += tabs(4) + 'Log in\n';
-                    html += tabs(3) + '</button>\n';
-                    html += tabs(3) + '<input type="text" placeholder="Password" id="loginText">\n';
-                    html += '        </div>\n';
+                    html += '        <button id="loginButton">\n';
+                    html += tabs(3) + 'Log in\n';
+                    html += '        </button>\n';
                 }
                 html += '        <h1 class="main-title">\n';
                 html += tabs(3) + S.getId("title").value + '\n';
