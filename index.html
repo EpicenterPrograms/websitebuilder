@@ -27,6 +27,16 @@
                     S.getId("navigationSection").style.display = "none";
                 }
             });
+            S.listen("externalStyles", "click", function() {
+                if (this.checked) {
+                    S.getId("externalStylingSection").style.display = "inline-block";
+                } else {
+                    S.getId("externalStylingSection").style.display = "none";
+                }
+            });
+            S.listen("addStyling", "click", function() {
+                
+            });
             S.listen("finish", "click", function() {
                 html = "";
                 function tabs(number) {
@@ -99,6 +109,11 @@
                 ["title", "copier"].forEach(function(ID) {
                     S.getId(ID).value = "";
                 });
+                ["navChoice"].forEach(function(ID) {
+                    S.getName(ID).forEach(function(radioButton) {
+                        radioButton.value = "";
+                    }, false);
+                });
                 S.getTag("textarea")[0].value = "";
             });
         </script>
@@ -134,6 +149,15 @@
                 content: "*";
                 color: red;
             }
+            .clickable:hover {
+                background-color: rgba(255, 255, 255, .25);
+            }
+            .big-plus {
+                position: relative;
+                top: .05em;
+                font-size: 1.5em;
+                font-weight: bold;
+            }
         </style>
     </head>
     <body>
@@ -160,6 +184,15 @@
                     <br>
                     <input type="radio" name="navChoice" id="topNav">
                     <label for="topNav">Contents on the top of the page</label>
+                </div>
+            </div>
+            <input type="checkbox" id="externalStyles">
+            <label for="externalStyles">Add external styling</label>
+            <div class="block">
+                <div class="group" id="externalStylingSection">
+                    <div id="addStyling">
+                        <span class="big-plus">+</span>&ensp;Add a style input
+                    </div>
                 </div>
             </div>
             <button id="advanced">
