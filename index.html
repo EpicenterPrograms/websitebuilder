@@ -111,7 +111,7 @@
                 });
                 ["navChoice"].forEach(function(ID) {
                     S.getName(ID).forEach(function(radioButton) {
-                        radioButton.value = "";
+                        radioButton.checked = false;
                     }, false);
                 });
                 S.getTag("textarea")[0].value = "";
