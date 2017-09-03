@@ -4,12 +4,9 @@
         <title>
             Website Builder
         </title>
-        <script>
-            var Standards = {};
-            Standards.options = {"simplification" : true};
-        </script>
         <script src="https://epicenterprograms.github.io/standards/behavior.js"></script>
         <script>
+            var S = Standards;
             var html = "";
             S.listen("advanced", "click", function() {
                 if (this.innerHTML.trim() == "Show advanced choices") {
