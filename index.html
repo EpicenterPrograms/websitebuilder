@@ -46,36 +46,48 @@
                 html += '        <title>\n';
                 html += tabs(3) + S.getId("title").value + '\n';
                 html += '        </title>\n';
-                if (S.getId("navSource").value) {
-                    html += '        <script>\n';
-                    html += tabs(3) + 'var Standards = {};\n';
-                    html += tabs(3) + 'Standards.options = {\n';
-                    html += tabs(4) + '"navigation": "' + S.getId("navSource").value + '"\n';
-                    html += tabs(3) + '};\n';
-                    html += '        </' + 'script>\n';
-                }
                 html += '        <script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
                 html += '        <link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting.css">\n';
                 html += '    </head>\n';
                 if (S.getName("navChoice", true).id == "leftNav") {
-                    html += '    <body class="left-nav">\n';
-                    html += '        <nav class="left-nav"></nav>\n';
+                    html += '    <body class="left-nav>\n';
+                    html += '        <nav class="left-nav"';
+                    if (S.getId("navSource").value) {
+                        html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
+                    } else {
+                        html += '></nav>\n';
+                    }
                 } else {
                     html += '    <body>\n';
                 }
                 if (S.getName("navChoice", true).id == "hiddenLeftNav") {
-                    html += '        <nav class="hidden-left-nav"></nav>\n';
+                    html += '        <nav class="hidden-left-nav"';
+                    if (S.getId("navSource").value) {
+                        html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
+                    } else {
+                        html += '></nav>\n';
+                    }
                 }
                 if (S.getId("signIn").checked) {
-                    html += '        <button id="loginButton">\n';
-                    html += tabs(3) + 'Log in\n';
-                    html += '        </button>\n';
+                    html += '        <div class="login-section">';
+                    html += tabs(3) + '<button id="login">\n';
+                    html += tabs(4) + 'Log in\n';
+                    html += tabs(3) + '</button>\n';
+                    html += tabs(3) + '<button id="register">\n';
+                    html += tabs(4) + 'Register\n';
+                    html += tabs(3) + '</button>\n';
+                    html += '        </div>';
                 }
                 html += '        <h1 class="main-title">\n';
                 html += tabs(3) + S.getId("title").value + '\n';
                 html += '        </h1>\n';
                 if (S.getName("navChoice", true).id == "topNav") {
-                    html += '        <nav class="top-nav"></nav>\n';
+                    html += '        <nav class="top-nav"';
+                    if (S.getId("navSource").value) {
+                        html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
+                    } else {
+                        html += '></nav>\n';
+                    }
                 }
                 html += '        <main>\n';
                 html += tabs(3) + '<p>\n';
