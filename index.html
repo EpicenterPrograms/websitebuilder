@@ -49,7 +49,7 @@
                 html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
                 html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
                 html += '\t</head>\n';
-                if (S.getName("navChoice", true).id == "leftNav") {
+                if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "leftNav") {
                     html += '    <body class="left-nav>\n';
                     html += '        <nav class="left-nav"';
                     if (S.getId("navSource").value) {
@@ -60,7 +60,7 @@
                 } else {
                     html += '    <body>\n';
                 }
-                if (S.getName("navChoice", true).id == "hiddenLeftNav") {
+                if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "hiddenLeftNav") {
                     html += '        <nav class="hidden-left-nav"';
                     if (S.getId("navSource").value) {
                         html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
@@ -81,7 +81,7 @@
                 html += '        <h1 class="main-title">\n';
                 html += tabs(3) + S.getId("title").value + '\n';
                 html += '        </h1>\n';
-                if (S.getName("navChoice", true).id == "topNav") {
+                if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "topNav") {
                     html += '        <nav class="top-nav"';
                     if (S.getId("navSource").value) {
                         html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
