@@ -37,18 +37,18 @@
             S.listen("finish", "click", function() {
                 html = "";
                 function tabs(number) {
-                    return "    ".repeat(number);
+                    return "\t".repeat(number);
                 }
                 html += '<!DOCTYPE html>\n';
                 html += '<!-- made with Epicenter website builder -->\n';
                 html += '<html class="html-class">\n';
-                html += '    <head>\n';
-                html += '        <title>\n';
+                html += '\t<head>\n';
+                html += '\t\t<title>\n';
                 html += tabs(3) + S.getId("title").value + '\n';
-                html += '        </title>\n';
-                html += '        <script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
-                html += '        <link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
-                html += '    </head>\n';
+                html += '\t\t</title>\n';
+                html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
+                html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
+                html += '\t</head>\n';
                 if (S.getName("navChoice", true).id == "leftNav") {
                     html += '    <body class="left-nav>\n';
                     html += '        <nav class="left-nav"';
@@ -69,14 +69,14 @@
                     }
                 }
                 if (S.getId("signIn").checked) {
-                    html += '        <div class="login-section">';
+                    html += '        <div class="login-section">\n';
                     html += tabs(3) + '<button id="login">\n';
                     html += tabs(4) + 'Log in\n';
                     html += tabs(3) + '</button>\n';
                     html += tabs(3) + '<button id="register">\n';
                     html += tabs(4) + 'Register\n';
                     html += tabs(3) + '</button>\n';
-                    html += '        </div>';
+                    html += '        </div>\n';
                 }
                 html += '        <h1 class="main-title">\n';
                 html += tabs(3) + S.getId("title").value + '\n';
