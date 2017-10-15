@@ -32,7 +32,19 @@
                 }
             });
             S.listen("addStyling", "click", function() {
-                
+                let container = document.createElement("div");
+                let input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Style source";
+                let X = document.createElement("span");
+                X.innerHTML = "X";
+                X.className = "big-X";
+                container.appendChild(input);
+                container.appendChild(X);
+                S.insertBefore(container, "addStyling");
+                S.listen(X, "click", function() {
+                    container.parentNode.removeChild(container);
+                });
             });
             S.listen("finish", "click", function() {
                 html = "";
@@ -48,6 +60,11 @@
                 html += '\t\t</title>\n';
                 html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
                 html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
+                S.getId("externalStylingSection").getElementsByTagName("input").forEach(function(source) {
+                    if (source.value.trim() != "") {
+                        html += '\t\t<link rel="stylesheet" href="' + source.value.trim() + '">\n';
+                    }
+                });
                 html += '\t</head>\n';
                 if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "leftNav") {
                     html += '\t<body class="left-nav>\n';
@@ -79,7 +96,11 @@
                     html += '\t\t</div>\n';
                 }
                 html += '\t\t<h1 class="main-title">\n';
-                html += '\t\t\t' + S.getId("title").value + '\n';
+                if (S.getId("navigation").checked) {
+                    html += '\t\t\tTitle\n';
+                } else {
+                    html += '\t\t\t' + S.getId("title").value + '\n';
+                }
                 html += '\t\t</h1>\n';
                 if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "topNav") {
                     html += '\t\t<nav class="top-nav"';
@@ -166,6 +187,13 @@
                 position: relative;
                 top: .05em;
                 font-size: 1.5em;
+                font-weight: bold;
+            }
+            .big-X {
+                font-family: monospace;
+                color: red;
+            }
+            .big-X:hover {
                 font-weight: bold;
             }
             #addStyling {
