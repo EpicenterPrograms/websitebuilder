@@ -33,11 +33,12 @@
             });
             S.listen("addStyling", "click", function() {
                 let container = document.createElement("div");
+                container.style.display = "block";
                 let input = document.createElement("input");
                 input.type = "text";
                 input.placeholder = "Style source";
                 let X = document.createElement("span");
-                X.innerHTML = "X";
+                X.innerHTML = " X";
                 X.className = "big-X";
                 container.appendChild(input);
                 container.appendChild(X);
@@ -191,10 +192,15 @@
             }
             .big-X {
                 font-family: monospace;
+                font-size: 1.5em;
                 color: red;
+                cursor: pointer;
             }
             .big-X:hover {
                 font-weight: bold;
+            }
+            #externalStylingSection input {
+                display: inline-block;
             }
             #addStyling {
                 padding: 0em .25em;
