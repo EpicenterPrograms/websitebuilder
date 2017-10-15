@@ -24,6 +24,33 @@
                     S.getId("navigationSection").style.display = "none";
                 }
             });
+            S.listen("externalScripts", "click", function() {
+                if (this.checked) {
+                    S.getId("externalScriptsSection").style.display = "inline-block";
+                } else {
+                    S.getId("externalScriptsSection").style.display = "none";
+                    let scriptNumber = S.getId("externalScriptsSection").children.length - 1;
+                    while (scriptNumber--) {
+                        S.getId("externalScriptsSection").removeChild(S.getId("externalScriptsSection").children[0]);
+                    }
+                }
+            });
+            S.listen("addScript", "click", function() {
+                let container = document.createElement("div");
+                container.style.display = "block";
+                let input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Script source";
+                let X = document.createElement("span");
+                X.innerHTML = " X";
+                X.className = "big-X";
+                container.appendChild(input);
+                container.appendChild(X);
+                S.insertBefore(container, "addScript");
+                S.listen(X, "click", function() {
+                    container.parentNode.removeChild(container);
+                });
+            });
             S.listen("externalStyles", "click", function() {
                 if (this.checked) {
                     S.getId("externalStylingSection").style.display = "inline-block";
@@ -52,6 +79,11 @@
                 });
             });
             S.listen("finish", "click", function() {
+                S.getTag("input").forEach(function(input) {
+                    if (input.type == "text") {
+                        input.value = input.value.trim();
+                    }
+                });
                 html = "";
                 function tabs(number) {
                     return "\t".repeat(number);
@@ -64,10 +96,15 @@
                 html += '\t\t\t' + S.getId("title").value + '\n';
                 html += '\t\t</title>\n';
                 html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
+                S.getId("externalScriptsSection").getElementsByTagName("input").forEach(function(source) {
+                    if (source.value != "") {
+                        html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
+                    }
+                });
                 html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
                 S.getId("externalStylingSection").getElementsByTagName("input").forEach(function(source) {
-                    if (source.value.trim() != "") {
-                        html += '\t\t<link rel="stylesheet" href="' + source.value.trim() + '">\n';
+                    if (source.value != "") {
+                        html += '\t\t<link rel="stylesheet" href="' + source.value + '">\n';
                     }
                 });
                 html += '\t</head>\n';
@@ -137,11 +174,18 @@
                 }
             });
             S.listen("startOver", "click", function() {
-                [/*"navigation", "leftNav", "hiddenLeftNav", "topNav"*/].forEach(function(ID) {
+                ["navigation", "externalScripts", "externalStyles"].forEach(function(ID) {
                     S.getId(ID).checked = false;
                 });
+                ["externalScriptsSection", "externalStylingSection"].forEach(function(section) {
+                    S.getId(section).style.display = "none";
+                    let repeatNumber = S.getId(section).children.length - 1;
+                    while (repeatNumber--) {
+                        S.getId(section).removeChild(S.getId(section).children[0]);
+                    }
+                });
                 S.getId("signIn").checked = true;
-                ["title", "copier"].forEach(function(ID) {
+                ["title", "navSource", "copier"].forEach(function(ID) {
                     S.getId(ID).value = "";
                 });
                 ["navChoice"].forEach(function(ID) {
@@ -149,10 +193,6 @@
                         radioButton.checked = false;
                     }, false);
                 });
-                let styleNumber = S.getId("externalStylingSection").children.length - 1;
-                while (styleNumber--) {
-                    S.getId("externalStylingSection").removeChild(S.getId("externalStylingSection").children[0]);
-                }
                 S.getTag("textarea")[0].value = "";
             });
         </script>
@@ -239,6 +279,15 @@
                     <br>
                     <input type="radio" name="navChoice" id="topNav">
                     <label for="topNav">Contents on the top of the page</label>
+                </div>
+            </div>
+            <input type="checkbox" id="externalScripts">
+            <label for="externalScripts">Add external scripts</label>
+            <div class="block">
+                <div class="group" id="externalScriptsSection">
+                    <div class="clickable" id="addScript">
+                        <span class="big-plus">+</span>&ensp;Add a script input
+                    </div>
                 </div>
             </div>
             <input type="checkbox" id="externalStyles">
