@@ -160,6 +160,7 @@
                 html += '\t</body>\n';
                 html += '</html>\n';
                 S.getTag("textarea")[0].value = html;
+                S.getId("preview").disabled = false;
             });
             S.listen("preview", "click", function() {
                 var preview = window.open();
@@ -196,6 +197,7 @@
                     }
                 });
                 S.getId("signIn").checked = true;
+                S.getId("preview").disabled = true;
                 S.getTag("textarea")[0].value = "";
             });
         </script>
@@ -323,7 +325,7 @@
             </button>
             <br>
             <br>
-            <button id="preview">
+            <button id="preview" disabled>
                 View preview
             </button>
             <br>
