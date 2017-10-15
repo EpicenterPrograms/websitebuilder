@@ -174,25 +174,28 @@
                 }
             });
             S.listen("startOver", "click", function() {
+                ["title", "navSource", "copier"].forEach(function(ID) {
+                    S.getId(ID).value = "";
+                });
                 ["navigation", "externalScripts", "externalStyles"].forEach(function(ID) {
                     S.getId(ID).checked = false;
                 });
-                ["externalScriptsSection", "externalStylingSection"].forEach(function(section) {
-                    S.getId(section).style.display = "none";
-                    let repeatNumber = S.getId(section).children.length - 1;
-                    while (repeatNumber--) {
-                        S.getId(section).removeChild(S.getId(section).children[0]);
-                    }
-                });
-                S.getId("signIn").checked = true;
-                ["title", "navSource", "copier"].forEach(function(ID) {
-                    S.getId(ID).value = "";
+                ["navigationSection"].forEach(function(ID) {
+                    S.getId(ID).style.display = "none";
                 });
                 ["navChoice"].forEach(function(ID) {
                     S.getName(ID).forEach(function(radioButton) {
                         radioButton.checked = false;
                     }, false);
                 });
+                ["externalScriptsSection", "externalStylingSection"].forEach(function(ID) {
+                    S.getId(ID).style.display = "none";
+                    let repeatNumber = S.getId(ID).children.length - 1;
+                    while (repeatNumber--) {
+                        S.getId(ID).removeChild(S.getId(ID).children[0]);
+                    }
+                });
+                S.getId("signIn").checked = true;
                 S.getTag("textarea")[0].value = "";
             });
         </script>
