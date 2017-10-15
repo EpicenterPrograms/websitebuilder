@@ -199,7 +199,7 @@
                 ["navigation", "externalScripts", "externalStyles"].forEach(function(ID) {
                     S.getId(ID).checked = false;
                 });
-                ["navigationSection"].forEach(function(ID) {
+                ["navigationSection", "advancedSection"].forEach(function(ID) {
                     S.getId(ID).style.display = "none";
                 });
                 ["navChoice"].forEach(function(ID) {
@@ -215,6 +215,7 @@
                     }
                 });
                 S.getId("signIn").checked = true;
+                S.getId("advanced").innerHTML = "Show advanced choices";
                 S.getId("preview").disabled = true;
                 S.getTag("textarea")[0].value = "";
             });
