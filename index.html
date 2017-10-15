@@ -183,7 +183,7 @@
             S.listen("preview", "click", function() {
                 var preview = window.open();
                 if (preview) {  // if pop-ups are allowed
-                    preview.document.write(html);
+                    preview.document.write(S.getTag("textarea")[0].value);
                     preview.focus();
                 } else {
                     S.makeDialog(
