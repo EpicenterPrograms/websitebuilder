@@ -29,6 +29,10 @@
                     S.getId("externalStylingSection").style.display = "inline-block";
                 } else {
                     S.getId("externalStylingSection").style.display = "none";
+                    let styleNumber = S.getId("externalStylingSection").children.length - 1;
+                    while (styleNumber--) {
+                        S.getId("externalStylingSection").removeChild(S.getId("externalStylingSection").children[0]);
+                    }
                 }
             });
             S.listen("addStyling", "click", function() {
@@ -145,6 +149,10 @@
                         radioButton.checked = false;
                     }, false);
                 });
+                let styleNumber = S.getId("externalStylingSection").children.length - 1;
+                while (styleNumber--) {
+                    S.getId("externalStylingSection").removeChild(S.getId("externalStylingSection").children[0]);
+                }
                 S.getTag("textarea")[0].value = "";
             });
         </script>
