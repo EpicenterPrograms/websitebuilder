@@ -1,360 +1,438 @@
 <!DOCTYPE html>
 <html class="html-class">
-    <head>
-        <title>
-            Website Builder
-        </title>
-        <script src="https://epicenterprograms.github.io/standards/behavior.js"></script>
-        <script>
-            var S = Standards;
-            var html = "";
-            S.listen("advanced", "click", function() {
-                if (this.innerHTML.trim() == "Show advanced choices") {
-                    S.getId("advancedSection").style.display = "inline-block";
-                    this.innerHTML = "Hide advanced choices";
-                } else {
-                    S.getId("advancedSection").style.display = "none";
-                    this.innerHTML = "Show advanced choices";
-                }
-            });
-            S.listen("navigation", "click", function() {
-                if (this.checked) {
-                    S.getId("navigationSection").style.display = "inline-block";
-                } else {
-                    S.getId("navigationSection").style.display = "none";
-                }
-            });
-            S.listen("externalScripts", "click", function() {
-                if (this.checked) {
-                    S.getId("externalScriptsSection").style.display = "inline-block";
-                } else {
-                    S.getId("externalScriptsSection").style.display = "none";
-                    let scriptNumber = S.getId("externalScriptsSection").children.length - 1;
-                    while (scriptNumber--) {
-                        S.getId("externalScriptsSection").removeChild(S.getId("externalScriptsSection").children[0]);
-                    }
-                }
-            });
-            S.listen("addScript", "click", function() {
-                let container = document.createElement("div");
-                container.style.display = "block";
-                let input = document.createElement("input");
-                input.type = "text";
-                input.placeholder = "Script source";
-                let X = document.createElement("span");
-                X.innerHTML = " X";
-                X.className = "big-X";
-                container.appendChild(input);
-                container.appendChild(X);
-                S.insertBefore(container, "addScript");
-                S.listen(X, "click", function() {
-                    container.parentNode.removeChild(container);
-                });
-            });
-            S.listen("externalStyles", "click", function() {
-                if (this.checked) {
-                    S.getId("externalStylingSection").style.display = "inline-block";
-                } else {
-                    S.getId("externalStylingSection").style.display = "none";
-                    let styleNumber = S.getId("externalStylingSection").children.length - 1;
-                    while (styleNumber--) {
-                        S.getId("externalStylingSection").removeChild(S.getId("externalStylingSection").children[0]);
-                    }
-                }
-            });
-            S.listen("addStyling", "click", function() {
-                let container = document.createElement("div");
-                container.style.display = "block";
-                let input = document.createElement("input");
-                input.type = "text";
-                input.placeholder = "Style source";
-                let X = document.createElement("span");
-                X.innerHTML = " X";
-                X.className = "big-X";
-                container.appendChild(input);
-                container.appendChild(X);
-                S.insertBefore(container, "addStyling");
-                S.listen(X, "click", function() {
-                    container.parentNode.removeChild(container);
-                });
-            });
-            S.listen("finish", "click", function() {
-                let satisfactorilyCompleted = true;
-                S.getClass("necessary").forEach(function(item) {
-                    if (item.tagName == "SPAN" || item.tagName == "DIV") {
-                        item.getElementsByTagName("input").forEach(function(input) {
-                            if (!input.value) {
-                                satisfactorilyCompleted = false;
-                            }
-                        });
-                    } else {
-                        if (!item.value) {
-                            satisfactorilyCompleted = false;
-                        }
-                    }
-                });
-                if (!satisfactorilyCompleted) {
-                    alert("You missed a required field.");
-                    return;
-                }
-                S.getTag("input").forEach(function(input) {
-                    if (input.type == "text") {
-                        input.value = input.value.trim();
-                    }
-                });
-                html = "";
-                function tabs(number) {
-                    return "\t".repeat(number);
-                }
-                html += '<!DOCTYPE html>\n';
-                html += '<!-- made with Epicenter website builder -->\n';
-                html += '<html class="html-class">\n';
-                html += '\t<head>\n';
-                html += '\t\t<title>\n';
-                html += '\t\t\t' + S.getId("title").value + '\n';
-                html += '\t\t</title>\n';
-                html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
-                S.getId("externalScriptsSection").getElementsByTagName("input").forEach(function(source) {
-                    if (source.value != "") {
-                        html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
-                    }
-                });
-                html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
-                S.getId("externalStylingSection").getElementsByTagName("input").forEach(function(source) {
-                    if (source.value != "") {
-                        html += '\t\t<link rel="stylesheet" href="' + source.value + '">\n';
-                    }
-                });
-                html += '\t</head>\n';
-                if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "leftNav") {
-                    html += '\t<body class="left-nav>\n';
-                    html += '\t\t<nav class="left-nav"';
-                    if (S.getId("navSource").value) {
-                        html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
-                    } else {
-                        html += '></nav>\n';
-                    }
-                } else {
-                    html += '\t<body>\n';
-                }
-                if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "hiddenLeftNav") {
-                    html += '\t\t<nav class="hidden-left-nav"';
-                    if (S.getId("navSource").value) {
-                        html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
-                    } else {
-                        html += '></nav>\n';
-                    }
-                }
-                if (S.getId("signIn").checked) {
-                    html += '\t\t<div class="login-section">\n';
-                    html += '\t\t\t<button id="login">\n';
-                    html += '\t\t\t\tLog in\n';
-                    html += '\t\t\t</button>\n';
-                    html += '\t\t\t<button id="register">\n';
-                    html += '\t\t\t\tRegister\n';
-                    html += '\t\t\t</button>\n';
-                    html += '\t\t</div>\n';
-                }
-                html += '\t\t<h1 class="main-title">\n';
-                if (S.getId("navigation").checked) {
-                    html += '\t\t\tTitle\n';
-                } else {
-                    html += '\t\t\t' + S.getId("title").value + '\n';
-                }
-                html += '\t\t</h1>\n';
-                if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "topNav") {
-                    html += '\t\t<nav class="top-nav"';
-                    if (S.getId("navSource").value) {
-                        html += ' data-href="' + S.getId("navSource").value + '"></nav>\n';
-                    } else {
-                        html += '></nav>\n';
-                    }
-                }
-                html += '\t\t<main>\n';
-                html += '\t\t\t<p>\n';
-                html += '\t\t\t\tPut your content here.\n';
-                html += '\t\t\t</p>\n';
-                html += '\t\t</main>\n';
-                html += '\t</body>\n';
-                html += '</html>\n';
-                S.getTag("textarea")[0].value = html;
-                S.getId("preview").disabled = false;
-            });
-            S.listen("preview", "click", function() {
-                var preview = window.open();
-                if (preview) {  // if pop-ups are allowed
-                    preview.document.write(S.getTag("textarea")[0].value);
-                    preview.focus();
-                } else {
-                    S.makeDialog(
-                        "You have to allow pop-ups<br>for the preview to appear.",
-                        ["Okay", function() {return;}]
-                    );
-                }
-            });
-            S.listen("startOver", "click", function() {
-                ["title", "navSource", "copier"].forEach(function(ID) {
-                    S.getId(ID).value = "";
-                });
-                ["navigation", "externalScripts", "externalStyles"].forEach(function(ID) {
-                    S.getId(ID).checked = false;
-                });
-                ["navigationSection", "advancedSection"].forEach(function(ID) {
-                    S.getId(ID).style.display = "none";
-                });
-                ["navChoice"].forEach(function(ID) {
-                    S.getName(ID).forEach(function(radioButton) {
-                        radioButton.checked = false;
-                    }, false);
-                });
-                ["externalScriptsSection", "externalStylingSection"].forEach(function(ID) {
-                    S.getId(ID).style.display = "none";
-                    let repeatNumber = S.getId(ID).children.length - 1;
-                    while (repeatNumber--) {
-                        S.getId(ID).removeChild(S.getId(ID).children[0]);
-                    }
-                });
-                S.getId("signIn").checked = true;
-                S.getId("advanced").innerHTML = "Show advanced choices";
-                S.getId("preview").disabled = true;
-                S.getTag("textarea")[0].value = "";
-            });
-        </script>
-        <link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">
-        <style>
-            button {
-                display: block;
-                margin: 1em auto;
-            }
-            input[type="text"] {
-                display: block;
-                margin: 1em auto;
-            }
-            textarea {
-                white-space: pre;
-                font-family: monospace;
-            }
-            .group {
-                display: none;
-                border: .05em solid #00aaee;
-                padding: .5em;
-            }
-            .block {
-                display: block;
-            }
-            span.necessary {
-                display: block;
-            }
-            .necessary input[type="text"] {
-                display: inline-block;
-            }
-            .necessary::after {
-                content: "*";
-                color: red;
-            }
-            .clickable:hover {
-                background-color: rgba(255, 255, 255, .25);
-                cursor: pointer;
-            }
-            .big-plus {
-                position: relative;
-                top: .05em;
-                font-size: 1.5em;
-                font-weight: bold;
-            }
-            .big-X {
-                font-family: monospace;
-                font-size: 1.5em;
-                color: red;
-                cursor: pointer;
-            }
-            .big-X:hover {
-                font-weight: bold;
-            }
-            #externalScriptsSection input {
-                display: inline-block;
-            }
-            #addScript {
-                padding: 0em .25em;
-            }
-            #externalStylingSection input {
-                display: inline-block;
-            }
-            #addStyling {
-                padding: 0em .25em;
-            }
-        </style>
-    </head>
-    <body>
-        <h1 class="main-title">
-            Website Builder
-        </h1>
-        <main>
-            <p>
-                Enter specifications for your website. Necessary fields have a red asterisk.
-            </p>
-            <span class="necessary"><input type="text" placeholder="Title" id="title"></span>
-            <input type="checkbox" id="navigation">
-            <label for="navigation">Navigation section</label>
-            <div class="block">
-                <div class="group" id="navigationSection">
-                    <input type="text" placeholder="Navigation source" id="navSource">
-                    <input type="radio" name="navChoice" id="leftNav">
-                    <label for="leftNav">Left positioned contents</label>
-                    <br>
-                    <br>
-                    <input type="radio" name="navChoice" id="hiddenLeftNav">
-                    <label for="hiddenLeftNav">Hidden contents on the left</label>
-                    <br>
-                    <br>
-                    <input type="radio" name="navChoice" id="topNav">
-                    <label for="topNav">Contents on the top of the page</label>
-                </div>
-            </div>
-            <input type="checkbox" id="externalScripts">
-            <label for="externalScripts">Add external scripts</label>
-            <div class="block">
-                <div class="group" id="externalScriptsSection">
-                    <div class="clickable" id="addScript">
-                        <span class="big-plus">+</span>&ensp;Add a script input
-                    </div>
-                </div>
-            </div>
-            <input type="checkbox" id="externalStyles">
-            <label for="externalStyles">Add external styling</label>
-            <div class="block">
-                <div class="group" id="externalStylingSection">
-                    <div class="clickable" id="addStyling">
-                        <span class="big-plus">+</span>&ensp;Add a style input
-                    </div>
-                </div>
-            </div>
-            <button id="advanced">
-                Show advanced choices
-            </button>
-            <div class="block">
-                <div class="group" id="advancedSection">
-                    <input type="text" placeholder="Enter a replication code" id="copier">
-                    <input type="checkbox" id="signIn" checked>
-                    <label for="signIn">Log-in section</label>
-                </div>
-            </div>
-            <button id="finish">
-                Finish
-            </button>
-            <br>
-            <br>
-            <button id="preview" disabled>
-                View preview
-            </button>
-            <br>
-            <br>
-            <textarea cols="80" rows="20"></textarea>
-            <br>
-            <br>
-            <button id="startOver">
-                Start over
-            </button>
-        </main>
-    </body>
+	<head>
+		<title>
+			Website Builder
+		</title>
+		<script src="https://epicenterprograms.github.io/standards/behavior.js"></script>
+		<script>
+			var S = Standards;
+			var html = "";
+			S.listen("advanced", "click", function() {
+				if (this.innerHTML.trim() == "Show advanced choices") {
+					S.getId("advancedSection").style.display = "inline-block";
+					this.innerHTML = "Hide advanced choices";
+				} else {
+					S.getId("advancedSection").style.display = "none";
+					this.innerHTML = "Show advanced choices";
+				}
+			});
+			S.listen("navigation", "click", function() {
+				if (this.checked) {
+					S.getId("navigationSection").style.display = "inline-block";
+				} else {
+					S.getId("navigationSection").style.display = "none";
+				}
+			});
+			S.listen("externalScripts", "click", function() {
+				if (this.checked) {
+					S.getId("externalScriptsSection").style.display = "inline-block";
+				} else {
+					S.getId("externalScriptsSection").style.display = "none";
+					let scriptNumber = S.getId("externalScriptsSection").children.length - 1;
+					while (scriptNumber--) {
+						S.getId("externalScriptsSection").removeChild(S.getId("externalScriptsSection").children[0]);
+					}
+				}
+			});
+			S.listen("addScript", "click", function() {
+				let container = document.createElement("div");
+				container.style.display = "block";
+				let input = document.createElement("input");
+				input.type = "text";
+				input.placeholder = "Script source";
+				let X = document.createElement("span");
+				X.innerHTML = " X";
+				X.className = "big-X";
+				container.appendChild(input);
+				container.appendChild(X);
+				S.insertBefore(container, "addScript");
+				S.listen(X, "click", function() {
+					container.parentNode.removeChild(container);
+				});
+			});
+			S.listen("externalStyles", "click", function() {
+				if (this.checked) {
+					S.getId("externalStylingSection").style.display = "inline-block";
+				} else {
+					S.getId("externalStylingSection").style.display = "none";
+					let styleNumber = S.getId("externalStylingSection").children.length - 1;
+					while (styleNumber--) {
+						S.getId("externalStylingSection").removeChild(S.getId("externalStylingSection").children[0]);
+					}
+				}
+			});
+			S.listen("addStyling", "click", function() {
+				let container = document.createElement("div");
+				container.style.display = "block";
+				let input = document.createElement("input");
+				input.type = "text";
+				input.placeholder = "Style source";
+				let X = document.createElement("span");
+				X.innerHTML = " X";
+				X.className = "big-X";
+				container.appendChild(input);
+				container.appendChild(X);
+				S.insertBefore(container, "addStyling");
+				S.listen(X, "click", function() {
+					container.parentNode.removeChild(container);
+				});
+			});
+			S.listen("createWebsite", "click", function() {
+				let satisfactorilyCompleted = true;
+				S.getClass("necessary").forEach(function(item) {
+					if (item.tagName == "SPAN" || item.tagName == "DIV") {
+						item.getElementsByTagName("input").forEach(function(input) {
+							if (!input.value) {
+								satisfactorilyCompleted = false;
+							}
+						});
+					} else {
+						if (!item.value) {
+							satisfactorilyCompleted = false;
+						}
+					}
+				});
+				if (!satisfactorilyCompleted) {
+					alert("You missed a required field.");
+					return;
+				}
+				S.getTag("input").forEach(function(input) {
+					if (input.type == "text") {
+						input.value = input.value.trim();
+					}
+				});
+				html = "";
+				function tabs(number) {
+					return "\t".repeat(number);
+				}
+				html += '<!DOCTYPE html>\n';
+				//// html += '<!-- made with Epicenter website builder -->\n';
+				html += '<html class="html-class">\n';
+				html += '\t<head>\n';
+				html += '\t\t<title>\n';
+				html += '\t\t\t' + S.getId("title").value + '\n';
+				html += '\t\t</title>\n';
+				html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
+				S.getId("externalScriptsSection").getElementsByTagName("input").forEach(function(source) {
+					if (source.value != "") {
+						html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
+					}
+				});
+				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
+				S.getId("externalStylingSection").getElementsByTagName("input").forEach(function(source) {
+					if (source.value != "") {
+						html += '\t\t<link rel="stylesheet" href="' + source.value + '">\n';
+					}
+				});
+				html += '\t</head>\n';
+				if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "leftNav") {
+					html += '\t<body class="left-nav">\n';
+					html += '\t\t<iframe class="left-nav"';
+					if (S.getId("navSource").value) {
+						html += ' src="' + S.getId("navSource").value + '"></iframe>\n';
+					} else {
+						html += '></iframe>\n';
+					}
+				} else {
+					html += '\t<body>\n';
+				}
+				if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "hiddenLeftNav") {
+					html += '\t\t<nav class="hidden-left-nav">';
+					if (S.getId("navSource").value) {
+						html += '\n\t\t\t<iframe src="' + S.getId("navSource").value + '"></iframe>\n\t\t';
+					}
+					html += '</nav>\n';
+				}
+				if (S.getName("navChoice", true) && S.getName("navChoice", true).id == "topNav") {
+					html += '\t\t<iframe class="top-nav"';
+					if (S.getId("navSource").value) {
+						html += ' src="' + S.getId("navSource").value + '"></iframe>\n';
+					} else {
+						html += '></iframe>\n';
+					}
+				}
+				html += '\t\t<h1 class="main-title">\n';
+				if (S.getId("navigation").checked) {
+					html += '\t\t\tTitle\n';
+				} else {
+					html += '\t\t\t' + S.getId("title").value + '\n';
+				}
+				html += '\t\t</h1>\n';
+				if (S.getId("signIn").checked) {
+					html += '\t\t<div class="user-section">\n';
+					html += '\t\t\t<button id="signIn">\n';
+					html += '\t\t\t\tLog in\n';
+					html += '\t\t\t</button>\n';
+					html += '\t\t\t<button id="signUp">\n';
+					html += '\t\t\t\tRegister\n';
+					html += '\t\t\t</button>\n';
+					html += '\t\t\t<button id="userSettings">\n';
+					html += '\t\t\t\tSettings\n';
+					html += '\t\t\t</button>\n';
+					html += '\t\t\t<button id="signOut">\n';
+					html += '\t\t\t\tLog out\n';
+					html += '\t\t\t</button>\n';
+					html += '\t\t</div>\n';
+				}
+				html += '\t\t<main>\n';
+				html += '\t\t\t<p>\n';
+				html += '\t\t\t\tPut your content here.\n';
+				html += '\t\t\t</p>\n';
+				html += '\t\t</main>\n';
+				html += '\t</body>\n';
+				html += '</html>\n';
+				S.getTag("textarea")[0].value = html;
+				S.getId("preview").disabled = false;
+			});
+			S.listen("createNavigation", "click", function () {
+				html = "";
+				html += '<!DOCTYPE html>\n';
+				//// html += "<!-- made with Epicenter website builder -->\n";
+				html += '<html class="html-class">\n';
+				html += '\t<head>\n';
+				html += '\t\t<base target="_parent">\n';
+				html += '\t</head>\n';
+				html += '\t<body class="navigation">\n';
+				html += '\t\t<h2>\n';
+				html += '\t\t\tContents\n';
+				html += '\t\t</h2>\n';
+				html += '\t\t<ul id="contentsList"></ul>\n';
+				html += '\t\t<script>\n';
+				html += '\t\t\t[  // [page URL, title]\n';
+				html += '\t\t\t\t\n';
+				html += '\t\t\t].forEach(function (pair) {\n';
+				html += '\t\t\t\tdocument.getElementById("contentsList").innerHTML += "<li><a href=\'" + pair[0] + "\'>" + pair[1] + "</a></li>";\n';
+				html += '\t\t\t});\n';
+				html += '\t\t</' + 'script>\n';
+				html += '\t</body>\n';
+				html += '</html>\n';
+				S.getTag("textarea")[0].value = html;
+			});
+			S.listen("preview", "click", function() {
+				var preview = window.open();
+				if (preview) {  // if pop-ups are allowed
+					preview.document.write(S.getTag("textarea")[0].value);
+					preview.focus();
+				} else {
+					S.makeDialog(
+						"You have to allow pop-ups<br>for the preview to appear.",
+						["Okay", function() {return;}]
+					);
+				}
+			});
+			S.listen("startOver", "click", function() {
+				["title", "navSource", "copier"].forEach(function(ID) {
+					S.getId(ID).value = "";
+				});
+				["navigation", "externalScripts", "externalStyles"].forEach(function(ID) {
+					S.getId(ID).checked = false;
+				});
+				["navigationSection", "advancedSection"].forEach(function(ID) {
+					S.getId(ID).style.display = "none";
+				});
+				["navChoice"].forEach(function(ID) {
+					S.getName(ID).forEach(function(radioButton) {
+						radioButton.checked = false;
+					}, false);
+				});
+				["externalScriptsSection", "externalStylingSection"].forEach(function(ID) {
+					S.getId(ID).style.display = "none";
+					let repeatNumber = S.getId(ID).children.length - 1;
+					while (repeatNumber--) {
+						S.getId(ID).removeChild(S.getId(ID).children[0]);
+					}
+				});
+				S.getId("signIn").checked = true;
+				S.getId("advanced").innerHTML = "Show advanced choices";
+				S.getId("preview").disabled = true;
+				S.getTag("textarea")[0].value = "";
+			});
+			S.onLoad(function () {
+				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
+					this.style.background = "#cfc";  //// "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "green";  //// "darkblue";
+					S.getId("navigationBuilder").style.display = "none";
+					S.getId("websiteBuilder").style.display = "block";
+				});
+				S.getTag("nav")[0].getElementsByTagName("button")[1].addEventListener("click", function () {
+					this.style.background = "#cfc";  //// "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "green";  //// "darkblue";
+					S.getId("websiteBuilder").style.display = "none";
+					S.getId("navigationBuilder").style.display = "block";
+				});
+			});
+		</script>
+		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">
+		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/christmas.css">
+		<style>
+			main {
+				margin-top: 0em;
+			}
+			nav.top-nav {
+				margin: auto;
+				width: 90%;
+			}
+			button {
+				display: block;
+				margin: 1em auto;
+			}
+			nav button:first-child {
+				background: #cfc;  /*lightsteelblue;*/
+			}
+			input[type="text"] {
+				display: block;
+				margin: 1em auto;
+			}
+			textarea {
+				white-space: pre;
+				font-family: monospace;
+			}
+			.group {
+				display: none;
+				border: .05em solid #00aaee;
+				padding: .5em;
+			}
+			.block {
+				display: block;
+			}
+			span.necessary {
+				display: block;
+			}
+			.necessary input[type="text"] {
+				display: inline-block;
+			}
+			.necessary::after {
+				content: "*";
+				color: red;
+			}
+			.clickable:hover {
+				background-color: rgba(255, 255, 255, .25);
+				cursor: pointer;
+			}
+			.big-plus {
+				position: relative;
+				top: .05em;
+				font-size: 1.5em;
+				font-weight: bold;
+			}
+			.big-X {
+				font-family: monospace;
+				font-size: 1.5em;
+				color: red;
+				cursor: pointer;
+			}
+			.big-X:hover {
+				font-weight: bold;
+			}
+			#websiteBuilder {
+				display: block;
+			}
+			#navigationBuilder {
+				display: none;
+			}
+			#externalScriptsSection input {
+				display: inline-block;
+			}
+			#addScript {
+				padding: 0em .25em;
+			}
+			#externalStylingSection input {
+				display: inline-block;
+			}
+			#addStyling {
+				padding: 0em .25em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 class="main-title">
+			Website Builder
+		</h1>
+		<nav class="top-nav">
+			<button>
+				Websites
+			</button>
+			<button>
+				Navigation
+			</button>
+		</nav>
+		<main>
+			<div id="websiteBuilder">
+				<p>
+					Enter specifications for your website. Necessary fields have a red asterisk.
+				</p>
+				<span class="necessary"><input type="text" placeholder="Title" id="title"></span>
+				<input type="checkbox" id="navigation">
+				<label for="navigation">Navigation section</label>
+				<div class="block">
+					<div class="group" id="navigationSection">
+						<input type="text" placeholder="Navigation source" id="navSource">
+						<input type="radio" name="navChoice" id="leftNav">
+						<label for="leftNav">Left positioned contents</label>
+						<br>
+						<br>
+						<input type="radio" name="navChoice" id="hiddenLeftNav">
+						<label for="hiddenLeftNav">Hidden contents on the left</label>
+						<br>
+						<br>
+						<input type="radio" name="navChoice" id="topNav">
+						<label for="topNav">Contents on the top of the page</label>
+					</div>
+				</div>
+				<input type="checkbox" id="externalScripts">
+				<label for="externalScripts">Add external scripts</label>
+				<div class="block">
+					<div class="group" id="externalScriptsSection">
+						<div class="clickable" id="addScript">
+							<span class="big-plus">+</span>&ensp;Add a script input
+						</div>
+					</div>
+				</div>
+				<input type="checkbox" id="externalStyles">
+				<label for="externalStyles">Add external styling</label>
+				<div class="block">
+					<div class="group" id="externalStylingSection">
+						<div class="clickable" id="addStyling">
+							<span class="big-plus">+</span>&ensp;Add a style input
+						</div>
+					</div>
+				</div>
+				<button id="advanced">
+					Show advanced choices
+				</button>
+				<div class="block">
+					<div class="group" id="advancedSection">
+						<input type="text" placeholder="Enter a replication code" id="copier">
+						<input type="checkbox" id="signIn" checked>
+						<label for="signIn">Log-in section</label>
+					</div>
+				</div>
+				<button id="createWebsite">
+					Finish
+				</button>
+			</div>
+			<div id="navigationBuilder">
+				<p>
+					Create your navigation section from here.
+				</p>
+				<button id="createNavigation">
+					Finish
+				</button>
+			</div>
+			<br>
+			<br>
+			<button id="preview" disabled>
+				View preview
+			</button>
+			<br>
+			<br>
+			<textarea cols="80" rows="20"></textarea>
+			<br>
+			<br>
+			<button id="startOver">
+				Start over
+			</button>
+		</main>
+	</body>
 </html>
