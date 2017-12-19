@@ -4,9 +4,9 @@
 		<title>
 			Website Builder
 		</title>
-		<script src="https://epicenterprograms.github.io/standards/behavior.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></script>
 		<script>
-			var S = Standards;
+			var S = Standards.general;
 			var html = "";
 			S.listen("advanced", "click", function() {
 				if (this.innerHTML.trim() == "Show advanced choices") {
@@ -113,7 +113,8 @@
 				html += '\t\t<title>\n';
 				html += '\t\t\t' + S.getId("title").value + '\n';
 				html += '\t\t</title>\n';
-				html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior.js"></' + 'script>\n';
+				html += '\t\t<base target="_blank">\n';
+				html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></' + 'script>\n';
 				S.getId("externalScriptsSection").getElementsByTagName("input").forEach(function(source) {
 					if (source.value != "") {
 						html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
@@ -192,6 +193,7 @@
 				html += '<html class="html-class">\n';
 				html += '\t<head>\n';
 				html += '\t\t<base target="_parent">\n';
+				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
 				html += '\t</head>\n';
 				html += '\t<body class="navigation">\n';
 				html += '\t\t<h2>\n';
