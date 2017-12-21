@@ -160,7 +160,7 @@
 					html += '\t\t\t' + S.getId("title").value + '\n';
 				}
 				html += '\t\t</h1>\n';
-				if (S.getId("signIn").checked) {
+				if (S.getId("login").checked) {
 					html += '\t\t<div class="user-section">\n';
 					html += '\t\t\t<button id="signIn">\n';
 					html += '\t\t\t\tLog in\n';
@@ -245,7 +245,7 @@
 						S.getId(ID).removeChild(S.getId(ID).children[0]);
 					}
 				});
-				S.getId("signIn").checked = true;
+				S.getId("login").checked = true;
 				S.getId("advanced").innerHTML = "Show advanced choices";
 				S.getId("preview").disabled = true;
 				S.getTag("textarea")[0].value = "";
@@ -406,8 +406,8 @@
 				<div class="block">
 					<div class="group" id="advancedSection">
 						<input type="text" placeholder="Enter a replication code" id="copier">
-						<input type="checkbox" id="signIn" checked>
-						<label for="signIn">Log-in section</label>
+						<input type="checkbox" id="login" checked>
+						<label for="login">Log-in section</label>
 					</div>
 				</div>
 				<button id="createWebsite">
