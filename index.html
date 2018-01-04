@@ -252,21 +252,20 @@
 			});
 			S.onLoad(function () {
 				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
-					this.style.background = "#cfc";  //// "lightsteelblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "green";  //// "darkblue";
+					this.style.background = "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
 					S.getId("navigationBuilder").style.display = "none";
 					S.getId("websiteBuilder").style.display = "block";
 				});
 				S.getTag("nav")[0].getElementsByTagName("button")[1].addEventListener("click", function () {
-					this.style.background = "#cfc";  //// "lightsteelblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "green";  //// "darkblue";
+					this.style.background = "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
 					S.getId("websiteBuilder").style.display = "none";
 					S.getId("navigationBuilder").style.display = "block";
 				});
 			});
 		</script>
 		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">
-		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/christmas.css">
 		<style>
 			main {
 				margin-top: 0em;
@@ -280,7 +279,7 @@
 				margin: 1em auto;
 			}
 			nav button:first-child {
-				background: #cfc;  /*lightsteelblue;*/
+				background: lightsteelblue;
 			}
 			input[type="text"] {
 				display: block;
