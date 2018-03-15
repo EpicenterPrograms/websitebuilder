@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html class="html-class">
+<!doctype html>
+<html>
 	<head>
 		<title>
 			Website Builder
@@ -106,9 +106,9 @@
 				function tabs(number) {
 					return "\t".repeat(number);
 				}
-				html += '<!DOCTYPE html>\n';
+				html += '<!doctype html>\n';
 				//// html += '<!-- made with Epicenter website builder -->\n';
-				html += '<html class="html-class">\n';
+				html += '<html>\n';
 				html += '\t<head>\n';
 				html += '\t\t<title>\n';
 				html += '\t\t\t' + S.getId("title").value + '\n';
@@ -188,9 +188,9 @@
 			});
 			S.listen("createNavigation", "click", function () {
 				html = "";
-				html += '<!DOCTYPE html>\n';
+				html += '<!doctype html>\n';
 				//// html += "<!-- made with Epicenter website builder -->\n";
-				html += '<html class="html-class">\n';
+				html += '<html>\n';
 				html += '\t<head>\n';
 				html += '\t\t<base target="_parent">\n';
 				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
@@ -405,7 +405,7 @@
 				<div class="block">
 					<div class="group" id="advancedSection">
 						<input type="text" placeholder="Enter a replication code" id="copier">
-						<input type="checkbox" id="login" checked>
+						<input type="checkbox" id="login">
 						<label for="login">Log-in section</label>
 					</div>
 				</div>
