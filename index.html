@@ -69,7 +69,7 @@
 				input.type = "text";
 				input.placeholder = "Style source";
 				let X = document.createElement("span");
-				X.innerHTML = " X";
+				X.textContent = " X";
 				X.className = "big-X";
 				container.appendChild(input);
 				container.appendChild(X);
@@ -80,7 +80,7 @@
 			});
 			S.listen("createWebsite", "click", function() {
 				let satisfactorilyCompleted = true;
-				S.getClass("necessary").forEach(function(item) {
+				S.forEach(S.getClass("necessary"), function(item) {
 					if (item.tagName == "SPAN" || item.tagName == "DIV") {
 						item.getElementsByTagName("input").forEach(function(input) {
 							if (!input.value) {
@@ -97,7 +97,7 @@
 					alert("You missed a required field.");
 					return;
 				}
-				S.getTag("input").forEach(function(input) {
+				S.forEach(S.getTag("input"), function(input) {
 					if (input.type == "text") {
 						input.value = input.value.trim();
 					}
@@ -115,13 +115,13 @@
 				html += '\t\t</title>\n';
 				html += '\t\t<base target="_blank">\n';
 				html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></' + 'script>\n';
-				S.getId("externalScriptsSection").getElementsByTagName("input").forEach(function(source) {
+				S.forEach(S.getId("externalScriptsSection").getElementsByTagName("input"), function(source) {
 					if (source.value != "") {
 						html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
 					}
 				});
 				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
-				S.getId("externalStylingSection").getElementsByTagName("input").forEach(function(source) {
+				S.forEach(S.getId("externalStylingSection").getElementsByTagName("input"), function(source) {
 					if (source.value != "") {
 						html += '\t\t<link rel="stylesheet" href="' + source.value + '">\n';
 					}
@@ -234,7 +234,7 @@
 					S.getId(ID).style.display = "none";
 				});
 				["navChoice"].forEach(function(ID) {
-					S.getName(ID).forEach(function(radioButton) {
+					S.forEach(S.getName(ID), function(radioButton) {
 						radioButton.checked = false;
 					}, false);
 				});
