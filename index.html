@@ -8,6 +8,7 @@
 		<script>
 			var S = Standards.general;
 			var html = "";
+
 			S.listen("advanced", "click", function() {
 				if (this.innerHTML.trim() == "Show advanced choices") {
 					S.getId("advancedSection").style.display = "inline-block";
@@ -17,6 +18,7 @@
 					this.innerHTML = "Show advanced choices";
 				}
 			});
+
 			S.listen("navigation", "click", function() {
 				if (this.checked) {
 					S.getId("navigationSection").style.display = "inline-block";
@@ -24,6 +26,7 @@
 					S.getId("navigationSection").style.display = "none";
 				}
 			});
+
 			S.listen("externalScripts", "click", function() {
 				if (this.checked) {
 					S.getId("externalScriptsSection").style.display = "inline-block";
@@ -35,6 +38,7 @@
 					}
 				}
 			});
+
 			S.listen("addScript", "click", function() {
 				let container = document.createElement("div");
 				container.style.display = "block";
@@ -51,6 +55,7 @@
 					container.parentNode.removeChild(container);
 				});
 			});
+
 			S.listen("externalStyles", "click", function() {
 				if (this.checked) {
 					S.getId("externalStylingSection").style.display = "inline-block";
@@ -62,6 +67,7 @@
 					}
 				}
 			});
+
 			S.listen("addStyling", "click", function() {
 				let container = document.createElement("div");
 				container.style.display = "block";
@@ -78,6 +84,7 @@
 					container.parentNode.removeChild(container);
 				});
 			});
+
 			S.listen("createWebsite", "click", function() {
 				let satisfactorilyCompleted = true;
 				S.forEach(S.getClass("necessary"), function(item) {
@@ -107,7 +114,6 @@
 					return "\t".repeat(number);
 				}
 				html += '<!doctype html>\n';
-				//// html += '<!-- made with Epicenter website builder -->\n';
 				html += '<html>\n';
 				html += '\t<head>\n';
 				html += '\t\t<title>\n';
@@ -117,12 +123,18 @@
 				html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></' + 'script>\n';
 				S.forEach(S.getId("externalScriptsSection").getElementsByTagName("input"), function(source) {
 					if (source.value != "") {
+						if (source.value[0] == "/") {
+							source.value = "https://epicenterprograms.github.io/standards/behavior" + source.value;
+						}
 						html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
 					}
 				});
 				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
 				S.forEach(S.getId("externalStylingSection").getElementsByTagName("input"), function(source) {
 					if (source.value != "") {
+						if (source.value[0] == "/") {
+							source.value = "https://epicenterprograms.github.io/standards/formatting" + source.value;
+						}
 						html += '\t\t<link rel="stylesheet" href="' + source.value + '">\n';
 					}
 				});
@@ -186,56 +198,35 @@
 				S.getTag("textarea")[0].value = html;
 				S.getId("preview").disabled = false;
 			});
+
 			S.listen("createNavigation", "click", function () {
 				html = "";
 				html += '<!doctype html>\n';
-				//// html += "<!-- made with Epicenter website builder -->\n";
 				html += '<html>\n';
 				html += '\t<head>\n';
 				html += '\t\t<base target="_parent">\n';
+				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/behavior/navigation.js">\n';
+				html += '\t\t<script>\n';
+				html += '\t\t\tStandards.navigation.contents = [  // [page URL, title]\n';
+				html += '\t\t\t\t\n';
+				html += '\t\t\t];\n';
+				html += '\t\t</' + 'script>\n';
 				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
 				html += '\t</head>\n';
-				html += '\t<body class="navigation">\n';
+				if (S.getId("biggerFontContents").checked) {
+					html += '\t<body class="navigation bigger">\n';
+				} else {
+					html += '\t<body class="navigation">\n';
+				}
 				html += '\t\t<h2>\n';
 				html += '\t\t\tContents\n';
 				html += '\t\t</h2>\n';
 				html += '\t\t<ul id="contentsList"></ul>\n';
-				html += '\t\t<script>\n';
-				html += '\t\t\t// sets the contents\n';
-				html += '\t\t\tvar navigationContents = [  // [page URL, title]\n';
-				html += '\t\t\t\t\n';
-				html += '\t\t\t];\n';
-				html += '\t\t\tnavigationContents.forEach(function (pair) {\n';
-				html += '\t\t\t\tlet listItem = document.createElement("li");\n';
-				html += '\t\t\t\tlet hiddenListItem = document.createElement("li");  // allows bolding without shifting the list\n';
-				html += '\t\t\t\thiddenListItem.className = "nav-list-expander";\n';
-				html += '\t\t\t\tif (pair[0].constructor === Array) {  // if the item should be expandable\n';
-				html += '\t\t\t\t\tlistItem.className = "expandable";\n';
-				html += '\t\t\t\t\tlet itemHTML;\n';
-				html += '\t\t\t\t\tpair.forEach(function (subpair, index) {\n';
-				html += '\t\t\t\t\t\tif (index === 0) {  // if it\'s the displayed item\n';
-				html += '\t\t\t\t\t\t\titemHTML = "<a href=\'" + subpair[0] + "\'>" + subpair[1] + "</a><ul>";\n';
-				html += '\t\t\t\t\t\t} else {\n';
-				html += '\t\t\t\t\t\t\titemHTML += "<li><a href=\'" + subpair[0] + "\'>" + subpair[1] + "</a></li>";\n';
-				html += '\t\t\t\t\t\t}\n';
-				html += '\t\t\t\t\t});\n';
-				html += '\t\t\t\t\titemHTML += "</ul>";\n';
-				html += '\t\t\t\t\tlistItem.innerHTML = itemHTML;\n';
-				html += '\t\t\t\t\tdocument.getElementById("contentsList").appendChild(listItem);\n';
-				html += '\t\t\t\t\thiddenListItem.innerHTML = itemHTML;\n';
-				html += '\t\t\t\t\tdocument.getElementById("contentsList").appendChild(hiddenListItem);\n';
-				html += '\t\t\t\t} else {\n';
-				html += '\t\t\t\t\tlistItem.innerHTML = "<a href=\'" + pair[0] + "\'>" + pair[1] + "</a>";\n';
-				html += '\t\t\t\t\tdocument.getElementById("contentsList").appendChild(listItem);\n';
-				html += '\t\t\t\t\thiddenListItem.innerHTML = pair[1];\n';
-				html += '\t\t\t\t\tdocument.getElementById("contentsList").appendChild(hiddenListItem);\n';
-				html += '\t\t\t\t}\n';
-				html += '\t\t\t});\n';
-				html += '\t\t</' + 'script>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
 				S.getTag("textarea")[0].value = html;
 			});
+
 			S.listen("preview", "click", function() {
 				var preview = window.open();
 				if (preview) {  // if pop-ups are allowed
@@ -248,6 +239,7 @@
 					);
 				}
 			});
+
 			S.listen("startOver", "click", function() {
 				["title", "navSource", "copier"].forEach(function(ID) {
 					S.getId(ID).value = "";
@@ -275,6 +267,7 @@
 				S.getId("preview").disabled = true;
 				S.getTag("textarea")[0].value = "";
 			});
+
 			S.onLoad(function () {
 				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
@@ -442,6 +435,9 @@
 				<p>
 					Create your navigation section from here.
 				</p>
+				<input type="checkbox" id="biggerFontContents">
+				<label for="biggerFontContents">Bigger font</label>
+				<br>
 				<button id="createNavigation">
 					Finish
 				</button>
