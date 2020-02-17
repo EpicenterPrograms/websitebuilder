@@ -4,6 +4,7 @@
 		<title>
 			Website Builder
 		</title>
+		<base target="_blank">
 		<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></script>
 		<script>
 			var S = Standards.general;
@@ -27,14 +28,14 @@
 				}
 			});
 
-			S.listen("externalScripts", "click", function() {
+			S.listen("extraScripts", "click", function() {
 				if (this.checked) {
-					S.getId("externalScriptsSection").style.display = "inline-block";
+					S.getId("extraScriptsSection").style.display = "inline-block";
 				} else {
-					S.getId("externalScriptsSection").style.display = "none";
-					let scriptNumber = S.getId("externalScriptsSection").children.length - 1;
+					S.getId("extraScriptsSection").style.display = "none";
+					let scriptNumber = S.getId("extraScriptsSection").children.length - 1;
 					while (scriptNumber--) {
-						S.getId("externalScriptsSection").removeChild(S.getId("externalScriptsSection").children[0]);
+						S.getId("extraScriptsSection").removeChild(S.getId("extraScriptsSection").children[0]);
 					}
 				}
 			});
@@ -56,14 +57,14 @@
 				});
 			});
 
-			S.listen("externalStyles", "click", function() {
+			S.listen("extraStyles", "click", function() {
 				if (this.checked) {
-					S.getId("externalStylingSection").style.display = "inline-block";
+					S.getId("extraStylingSection").style.display = "inline-block";
 				} else {
-					S.getId("externalStylingSection").style.display = "none";
-					let styleNumber = S.getId("externalStylingSection").children.length - 1;
+					S.getId("extraStylingSection").style.display = "none";
+					let styleNumber = S.getId("extraStylingSection").children.length - 1;
 					while (styleNumber--) {
-						S.getId("externalStylingSection").removeChild(S.getId("externalStylingSection").children[0]);
+						S.getId("extraStylingSection").removeChild(S.getId("extraStylingSection").children[0]);
 					}
 				}
 			});
@@ -85,7 +86,10 @@
 				});
 			});
 
-			S.listen("createWebsite", "click", function() {
+
+
+			S.listen("createWebsite", "click", function () {
+				// determines whether everything is filled out correctly
 				let satisfactorilyCompleted = true;
 				S.forEach(S.getClass("necessary"), function(item) {
 					if (item.tagName == "SPAN" || item.tagName == "DIV") {
@@ -104,11 +108,27 @@
 					alert("You missed a required field.");
 					return;
 				}
+				// makes sure there aren't any random spaces in anything
 				S.forEach(S.getTag("input"), function(input) {
 					if (input.type == "text") {
 						input.value = input.value.trim();
 					}
 				});
+				// makes sure inputs have the correct file extensions
+				if (S.getId("navSource").value && !(S.getId("navSource").value.slice(-5) == ".html" || S.getId("navSource").value.slice(-4) == ".htm")) {
+					S.getId("navSource").value += ".html";
+				}
+				S.forEach(S.getId("extraScriptsSection").getElementsByTagName("input"), function(source) {
+					if (source.value && source.value.slice(-3) != ".js") {
+						source.value += ".js";
+					}
+				});
+				S.forEach(S.getId("extraStylingSection").getElementsByTagName("input"), function(source) {
+					if (source.value && source.value.slice(-4) != ".css") {
+						source.value += ".css";
+					}
+				});
+				// creates the website HTML
 				html = "";
 				function tabs(number) {
 					return "\t".repeat(number);
@@ -121,16 +141,24 @@
 				html += '\t\t</title>\n';
 				html += '\t\t<base target="_blank">\n';
 				html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></' + 'script>\n';
-				S.forEach(S.getId("externalScriptsSection").getElementsByTagName("input"), function(source) {
+				if (S.getId("login").checked) {
+					html += '\t\t<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></' + 'script>\n';
+					html += '\t\t<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-firestore.js"></' + 'script>\n';
+					html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior/firebaseinit.js"></' + 'script>\n';
+					html += '\t\t<script src="https://epicenterprograms.github.io/standards/behavior/storage.js"></' + 'script>\n';
+				}
+				S.forEach(S.getId("extraScriptsSection").getElementsByTagName("input"), function(source) {
 					if (source.value != "") {
 						if (source.value[0] == "/") {
-							source.value = "https://epicenterprograms.github.io/standards/behavior" + source.value;
+							if (!(S.getId("login").checked && source.value == "/storage.js")) {
+								source.value = "https://epicenterprograms.github.io/standards/behavior" + source.value;
+							}
 						}
 						html += '\t\t<script src="' + source.value + '"></' + 'script>\n';
 					}
 				});
 				html += '\t\t<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">\n';
-				S.forEach(S.getId("externalStylingSection").getElementsByTagName("input"), function(source) {
+				S.forEach(S.getId("extraStylingSection").getElementsByTagName("input"), function(source) {
 					if (source.value != "") {
 						if (source.value[0] == "/") {
 							source.value = "https://epicenterprograms.github.io/standards/formatting" + source.value;
@@ -199,6 +227,7 @@
 				S.getId("preview").disabled = false;
 			});
 
+
 			S.listen("createNavigation", "click", function () {
 				html = "";
 				html += '<!doctype html>\n';
@@ -227,6 +256,8 @@
 				S.getTag("textarea")[0].value = html;
 			});
 
+
+
 			S.listen("preview", "click", function() {
 				var preview = window.open();
 				if (preview) {  // if pop-ups are allowed
@@ -244,7 +275,7 @@
 				["title", "navSource", "copier"].forEach(function(ID) {
 					S.getId(ID).value = "";
 				});
-				["navigation", "externalScripts", "externalStyles"].forEach(function(ID) {
+				["navigation", "extraScripts", "extraStyles"].forEach(function(ID) {
 					S.getId(ID).checked = false;
 				});
 				["navigationSection", "advancedSection"].forEach(function(ID) {
@@ -255,7 +286,7 @@
 						radioButton.checked = false;
 					}, false);
 				});
-				["externalScriptsSection", "externalStylingSection"].forEach(function(ID) {
+				["extraScriptsSection", "extraStylingSection"].forEach(function(ID) {
 					S.getId(ID).style.display = "none";
 					let repeatNumber = S.getId(ID).children.length - 1;
 					while (repeatNumber--) {
@@ -304,6 +335,8 @@
 				margin: 1em auto;
 			}
 			textarea {
+				width: 40em;
+				height: 30em;
 				white-space: pre;
 				font-family: monospace;
 			}
@@ -350,13 +383,13 @@
 			#navigationBuilder {
 				display: none;
 			}
-			#externalScriptsSection input {
+			#extraScriptsSection input {
 				display: inline-block;
 			}
 			#addScript {
 				padding: 0em .25em;
 			}
-			#externalStylingSection input {
+			#extraStylingSection input {
 				display: inline-block;
 			}
 			#addStyling {
@@ -399,19 +432,19 @@
 						<label for="topNav">Contents on the top of the page</label>
 					</div>
 				</div>
-				<input type="checkbox" id="externalScripts">
-				<label for="externalScripts">Add external scripts</label>
+				<input type="checkbox" id="extraScripts">
+				<label for="extraScripts">Add extra scripts</label>
 				<div class="block">
-					<div class="group" id="externalScriptsSection">
+					<div class="group" id="extraScriptsSection">
 						<div class="clickable" id="addScript">
 							<span class="big-plus">+</span>&ensp;Add a script input
 						</div>
 					</div>
 				</div>
-				<input type="checkbox" id="externalStyles">
-				<label for="externalStyles">Add external styling</label>
+				<input type="checkbox" id="extraStyles">
+				<label for="extraStyles">Add extra styling</label>
 				<div class="block">
-					<div class="group" id="externalStylingSection">
+					<div class="group" id="extraStylingSection">
 						<div class="clickable" id="addStyling">
 							<span class="big-plus">+</span>&ensp;Add a style input
 						</div>
@@ -422,7 +455,7 @@
 				</button>
 				<div class="block">
 					<div class="group" id="advancedSection">
-						<input type="text" placeholder="Enter a replication code" id="copier">
+						<input type="text" placeholder="Enter a replication code" id="copier" style="display:none">
 						<input type="checkbox" id="login">
 						<label for="login">Log-in section</label>
 					</div>
@@ -436,7 +469,7 @@
 					Create your navigation section from here.
 				</p>
 				<input type="checkbox" id="biggerFontContents">
-				<label for="biggerFontContents">Bigger font</label>
+				<label for="biggerFontContents">Bigger font (useful for hidden contents)</label>
 				<br>
 				<button id="createNavigation">
 					Finish
