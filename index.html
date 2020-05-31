@@ -136,6 +136,9 @@
 				html += '<!doctype html>\n';
 				html += '<html>\n';
 				html += '\t<head>\n';
+				if (S.getId("favicon").value.trim()) {
+					html += '\t\t<link rel="icon" href="' + S.getId("favicon").value.trim() + '">\n';
+                }
 				html += '\t\t<title>\n';
 				html += '\t\t\t' + S.getId("title").value + '\n';
 				html += '\t\t</title>\n';
@@ -415,11 +418,12 @@
 					Enter specifications for your website. Necessary fields have a red asterisk.
 				</p>
 				<span class="necessary"><input type="text" placeholder="Title" id="title"></span>
+				<input type="text" id="favicon" placeholder="Icon location">
 				<input type="checkbox" id="navigation">
 				<label for="navigation">Navigation section</label>
 				<div class="block">
 					<div class="group" id="navigationSection">
-						<input type="text" placeholder="Navigation source" id="navSource">
+						<span class="necessary"><input type="text" placeholder="Navigation source" id="navSource"></span>
 						<input type="radio" name="navChoice" id="leftNav">
 						<label for="leftNav">Left positioned contents</label>
 						<br>
