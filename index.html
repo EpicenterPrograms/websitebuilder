@@ -6,9 +6,103 @@
 		</title>
 		<base target="_blank">
 		<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-firestore.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/firebaseinit.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/storage.js"></script>
 		<script>
 			var S = Standards.general;
+			var M = Standards.storage;
+			M.session.defaultLocation = "websitebuilder";
+			M.local.defaultLocation = "websitebuilder";
+			M.server.defaultLocation = "/websitebuilder";
 			var html = "";
+			var highlightTimeout;
+
+
+			function highlightWebsite(hlHTML) {
+				let tagNameColor = "blue";
+				let outerTagColor = "darkcyan";
+				let tagRemainderColor = "cyan";
+				let HTMLCharColor = "lightgreen";
+				let commentColor = "green";
+				hlHTML = hlHTML.replace(/(^|\n\t*[^"'\n]*)(\&lt;(?!!--)\/?)([^ \n&]+)(.*?)(\&gt;)/g,  // colors the outer and inner parts of the HTML tags
+					"$1<span class='highlighting' style='color:" + outerTagColor + "'>$2</span><span class='highlighting' style='color:" + tagNameColor + "'>$3</span><span class='highlighting' style='color:" + tagRemainderColor + "'>$4</span><span class='highlighting' style='color:" + outerTagColor + "'>$5</span>");
+				hlHTML = hlHTML.replace(/(\&amp;[^;& \n]+?;)/g, "<span class='highlighting' style='color:" + HTMLCharColor + "'>$1</span>"); // colors HTML esc seqs
+				hlHTML = hlHTML.replace(/(\&lt;!--[^]*?--\&gt;)/g, "<span class='highlighting' style='color:" + commentColor + "'>$1</span>");  // colors HTML comments
+				hlHTML = hlHTML.replace(/(>script<.+)([^]+?)(<span.+\&lt;\/.+>script<)/g, function (_, openingTag, contents, closingTag) {  // colors JavaScript
+					return openingTag + highlightJavaScript(contents) + closingTag;
+				});
+				hlHTML = hlHTML.replace(/(>style<.+)([^]+?)(<span.+\&lt;\/.+>style<)/g, function (_, openingTag, contents, closingTag) {  // colors CSS
+					return openingTag + highlightCSS(contents) + closingTag;
+				});
+				return hlHTML;
+			}
+
+			function highlightJavaScript(hlHTML) {
+				let keywordColor = "blue";
+				let builtInColor = "orange";
+				let quoteColor = "indianred";
+				let commentColor = "green";
+				hlHTML = hlHTML.replace(/(\W)(var|let|function|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield|typeof)( |\(|\{|:)/g,
+					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>$3");  // colors JavaScript keywords
+				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event)( |\.)/g,
+					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>$3");  // colors built-in JavaScript objects
+				hlHTML = hlHTML.replace(/(<span.+?>)|(".*?"|'.*?')/g, function (match, tag, str) {  // colors strings
+					if (match == tag) {  // prevents putting spans within spans
+						return tag;
+					} else if (match == str) {
+						return "<span class='highlighting' style='color:" + quoteColor + "'>" + str + "</span>";
+					}
+				});
+				hlHTML = hlHTML.replace(/(\/\*[^]*?\*\/|\/\/.*)/g, "<span class='highlighting' style='color:" + commentColor + "'>$1</span>");  // colors comments
+				return hlHTML;
+			}
+
+			function highlightCSS(hlHTML) {
+				let propertyColor = "lightgreen";
+				let selectorColor = "yellow";
+				let commentColor = "green";
+				hlHTML = hlHTML.replace(/(.+)(?=:)/g, "<span class='highlighting' style='color:" + propertyColor + "'>$1</span>");  // colors CSS properties
+				hlHTML = hlHTML.replace(/(.+)(?= ?\{)/g, "<span class='highlighting' style='color:" + selectorColor + "'>$1</span>");  // colors CSS selectors
+				hlHTML = hlHTML.replace(/(\/\*[^]*?\*\/)/g, "<span class='highlighting' style='color:" + commentColor + "'>$1</span>");  // colors comments
+				return hlHTML;
+			}
+
+			function updateCode(updateLines) {
+				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
+				let hlHTML = S.getId("codeHighlighter").innerHTML;  // highlighted HTML (doesn't make the page repeatedly rerender)
+				clearTimeout(highlightTimeout);
+				highlightTimeout = setTimeout(function () {  // prevents performance issues from needing to refresh so much so often
+					hlHTML = highlightWebsite(hlHTML);
+					S.getId("codeHighlighter").innerHTML = hlHTML;
+					if (updateLines) {
+						S.getId("lineNumbers").innerHTML = "";
+						let newLines = "";
+						S.forEach(S.getId("codeDisplay").textContent.split("\n").length, function (_, index) {
+							newLines += "<section class='line-number'>" + (index + 1) + "</section>";
+						});
+						S.getId("lineNumbers").innerHTML = newLines;
+						// allows highlighting line numbers
+						S.forEach(S.getClass("line-number"), function (num) {
+							let selected = false;
+							num.addEventListener("click", function () {
+								if (selected) {
+									this.style.background = "none";
+									this.style.color = "white";
+									selected = false;
+								} else {
+									this.style.background = "yellow";
+									this.style.color = "black";
+									selected = true;
+								}
+							});
+						});
+					}
+				}, 100);
+			}
+
+
 
 			S.listen("advanced", "click", function() {
 				if (this.innerHTML.trim() == "Show advanced choices") {
@@ -228,8 +322,9 @@
 				html += '\t\t</main>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
-				S.getTag("textarea")[0].value = html;
+				S.getId("codeDisplay").textContent = html;
 				S.getId("preview").disabled = false;
+				updateCode(true);
 			});
 
 
@@ -258,7 +353,103 @@
 				html += '\t\t<ul id="contentsList"></ul>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
-				S.getTag("textarea")[0].value = html;
+				S.getId("codeDisplay").textContent = html;
+				updateCode(true);
+			});
+
+
+			S.listen("codeDisplay", "keydown", function (event) {
+				if (event.key == "Enter") {
+					event.preventDefault();
+					let selection = window.getSelection();
+					let range = selection.getRangeAt(0);
+					let offset = range.startOffset;
+					let beforeNewLine = this.textContent.slice(0, range.startOffset);
+					let tabs = "";
+					if (beforeNewLine.lastIndexOf("\n") < range.startOffset) {
+						tabs = beforeNewLine.slice(beforeNewLine.lastIndexOf("\n")).match(/\t+/);
+						if (tabs === null) {
+							tabs = "";
+						} else {
+							tabs = tabs[0];
+						}
+						if (S.itemAt(beforeNewLine, -1) == "{" || S.itemAt(beforeNewLine, -1) == ">" && !beforeNewLine.slice(beforeNewLine.lastIndexOf("<")).includes("/")) {  // if the new line comes after an opening curly brace or an opening HTML tag
+							tabs += "\t";
+						}
+					}
+					this.textContent = this.textContent.slice(0, range.startOffset) + "\n" + tabs + this.textContent.slice(range.endOffset);
+					// puts the caret in the correct spot
+					let newRange = document.createRange();
+					newRange.setStart(this.childNodes[0], offset + tabs.split("\t").length);
+					newRange.collapse(true);
+					selection.removeAllRanges();
+					selection.addRange(newRange);
+				} else if (event.key == "Tab") {
+					event.preventDefault();
+					let selection = window.getSelection();
+					let range = selection.getRangeAt(0);
+					let offset = range.startOffset;
+					this.textContent = this.textContent.slice(0, range.startOffset) + "\t" + this.textContent.slice(range.endOffset);
+					// puts the caret in the correct spot
+					let newRange = document.createRange();
+					newRange.setStart(this.childNodes[0], offset + 1);
+					newRange.collapse(true);
+					selection.removeAllRanges();
+					selection.addRange(newRange);
+				} else if (event.key == "," || event.key == ".") {
+					let selection = window.getSelection();
+					let range = selection.getRangeAt(0);
+					let offset = range.startOffset;
+					let beforeNewLine = this.textContent.slice(0, range.startOffset);
+					if (beforeNewLine.length > 1) {
+						beforeNewLine = beforeNewLine.slice(-2);
+						if (beforeNewLine == ",," && event.key == ",") {
+							event.preventDefault();
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + "\t" + this.textContent.slice(range.endOffset);  // replaces ",,," with "\t"
+							// puts the caret in the correct spot
+							let newRange = document.createRange();
+							newRange.setStart(this.childNodes[0], offset - 1);
+							newRange.collapse(true);
+							selection.removeAllRanges();
+							selection.addRange(newRange);
+						} else if (beforeNewLine == ",," && event.key == ".") {
+							event.preventDefault();
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + "<" + this.textContent.slice(range.endOffset);  // replaces ",,." with "<"
+							// puts the caret in the correct spot
+							let newRange = document.createRange();
+							newRange.setStart(this.childNodes[0], offset - 1);
+							newRange.collapse(true);
+							selection.removeAllRanges();
+							selection.addRange(newRange);
+						} else if (beforeNewLine == ".," && event.key == ",") {
+							event.preventDefault();
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + "/" + this.textContent.slice(range.endOffset);  // replaces ".,," with "/"
+							// puts the caret in the correct spot
+							let newRange = document.createRange();
+							newRange.setStart(this.childNodes[0], offset - 1);
+							newRange.collapse(true);
+							selection.removeAllRanges();
+							selection.addRange(newRange);
+						} else if (beforeNewLine == ",." && event.key == ".") {
+							event.preventDefault();
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + ">" + this.textContent.slice(range.endOffset);  // replaces ",.." with ">"
+							// puts the caret in the correct spot
+							let newRange = document.createRange();
+							newRange.setStart(this.childNodes[0], offset - 1);
+							newRange.collapse(true);
+							selection.removeAllRanges();
+							selection.addRange(newRange);
+						}
+					}
+				}
+				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
+			});
+			S.listen("codeDisplay", "keyup", function (event) {
+				if (event.key == "Enter" || event.key == "Backspace") {
+					updateCode(true);
+				} else {
+					updateCode();
+				}
 			});
 
 
@@ -266,7 +457,7 @@
 			S.listen("preview", "click", function() {
 				var preview = window.open();
 				if (preview) {  // if pop-ups are allowed
-					preview.document.write(S.getTag("textarea")[0].value);
+					preview.document.write(S.getId("codeDisplay").textContent);
 					preview.focus();
 				} else {
 					S.makeDialog(
@@ -301,36 +492,57 @@
 				S.getId("login").checked = true;
 				S.getId("advanced").innerHTML = "Show advanced choices";
 				S.getId("preview").disabled = true;
-				S.getTag("textarea")[0].value = "";
+				S.getId("codeDisplay").textContent = "";
+				updateCode(true);
 			});
 
 			S.onLoad(function () {
 				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
 					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[2].style.background = "darkblue";
 					S.getId("navigationBuilder").style.display = "none";
+					S.getId("codeEditor").style.display = "none";
 					S.getId("websiteBuilder").style.display = "block";
 				});
 				S.getTag("nav")[0].getElementsByTagName("button")[1].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
 					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[2].style.background = "darkblue";
 					S.getId("websiteBuilder").style.display = "none";
+					S.getId("codeEditor").style.display = "none";
 					S.getId("navigationBuilder").style.display = "block";
+				});
+				S.getTag("nav")[0].getElementsByTagName("button")[2].addEventListener("click", function () {
+					this.style.background = "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
+					S.getId("websiteBuilder").style.display = "none";
+					S.getId("navigationBuilder").style.display = "none";
+					S.getId("codeEditor").style.display = "block";
 				});
 			});
 		</script>
 		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">
 		<style>
+			*, nav.top-nav > button {
+				font-family: monospace;
+			}
 			main {
 				margin-top: 0em;
 			}
 			nav.top-nav {
 				margin: auto;
+				z-index: 2;
 				width: 90%;
 			}
 			button {
 				display: block;
 				margin: 1em auto;
+			}
+			.user-section button {
+				display: inline-block;
+				margin: .5em;
 			}
 			nav button:first-child {
 				background: lightsteelblue;
@@ -339,11 +551,57 @@
 				display: block;
 				margin: 1em auto;
 			}
-			textarea {
-				width: 40em;
-				height: 30em;
+			#codeContainer {
+				position: relative;
+				width: 100%;
+				height: 20em;
+				background: black;
+				text-align: left;
+				font-family: monospace;
+				overflow: auto;
+			}
+			#codeHighlighter, #codeDisplay {
+				position: absolute;
+				left: 3em;
+				top: 0em;
+				min-width: calc(100% - 3em);
+				min-height: 100%;
+				tab-size: 4;
+				text-align: left;
 				white-space: pre;
 				font-family: monospace;
+				outline: none;
+			}
+			#codeHighlighter {
+				color: white;
+			}
+			#codeDisplay {
+				border: none;
+				padding: 0em;
+				background: transparent;
+				color: transparent;
+				caret-color: gray;
+				resize: none;
+			}
+			#lineNumbers {
+				position: sticky;
+				left: 0em;
+				z-index: 1;
+				border-right: .05em solid gray;
+				width: 3em;
+				min-height: 100%;
+				background: black;
+				color: white;
+				text-align: right;
+			}
+			.highlighting .highlighting {
+				color: inherit !important;
+			}
+			.line-number {
+				margin: 0em;
+				text-align: right;
+				text-align-last: right;
+				cursor: pointer;
 			}
 			.group {
 				display: none;
@@ -388,6 +646,9 @@
 			#navigationBuilder {
 				display: none;
 			}
+			#codeEditor {
+				display: none;
+			}
 			#extraScriptsSection input {
 				display: inline-block;
 			}
@@ -400,12 +661,35 @@
 			#addStyling {
 				padding: 0em .25em;
 			}
+
+			@media (max-width: 1000px) {
+				nav.top-nav {
+					width: 100%;
+				}
+				nav.top-nav > button {
+					font-size: 1em;
+				}
+			}
 		</style>
 	</head>
 	<body>
 		<h1 class="main-title">
 			Website Builder
 		</h1>
+		<div class="user-section">
+			<button id="signIn">
+				Log in
+			</button>
+			<button id="signUp">
+				Register
+			</button>
+			<button id="userSettings">
+				Settings
+			</button>
+			<button id="signOut">
+				Log out
+			</button>
+		</div>
 		<nav class="top-nav">
 			<button>
 				Websites
@@ -413,12 +697,15 @@
 			<button>
 				Navigation
 			</button>
+			<button>
+				Editor
+			</button>
 		</nav>
 		<main>
 			<div id="websiteBuilder">
-				<p>
+				<section>
 					Enter specifications for your website. Necessary fields have a red asterisk.
-				</p>
+				</section>
 				<span class="necessary"><input type="text" placeholder="Title" id="title"></span>
 				<input type="text" id="favicon" placeholder="Icon location">
 				<input type="checkbox" id="navigation">
@@ -471,9 +758,9 @@
 				</button>
 			</div>
 			<div id="navigationBuilder">
-				<p>
+				<section>
 					Create your navigation section from here.
-				</p>
+				</section>
 				<input type="checkbox" id="biggerFontContents">
 				<label for="biggerFontContents">Bigger font (useful for hidden contents)</label>
 				<br>
@@ -481,14 +768,22 @@
 					Finish
 				</button>
 			</div>
-			<br>
+			<div id="codeEditor">
+				<section>
+					Edit code here.
+				</section>
+			</div>
 			<br>
 			<button id="preview" disabled>
 				View preview
 			</button>
 			<br>
 			<br>
-			<textarea cols="80" rows="20"></textarea>
+			<div id="codeContainer">
+				<div id="codeHighlighter"></div>
+				<div id="codeDisplay" contenteditable="true"></div>
+				<div id="lineNumbers">1</div>
+			</div>
 			<br>
 			<br>
 			<button id="startOver">
