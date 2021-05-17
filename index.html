@@ -454,7 +454,7 @@
 			});
 
 			S.listen("listProjects", "click", function () {
-				S.makeDialog(M.session.list("../", { shallowKeyList: true }).join(", "));
+				S.makeDialog(decodeURIComponent(M.session.list("../", { shallowKeyList: true }).join(", ")));
 			});
 
 
@@ -623,7 +623,7 @@
 				});
 
 				S.forEach(M.local.list("/websitebuilder/"), function (key) {
-					M.session.store(key, M.local.recall(key));
+					M.session.store("/websitebuilder/" + key, M.local.recall("/websitebuilder/" + key));
 				});
 			});
 
