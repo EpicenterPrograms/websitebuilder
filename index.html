@@ -69,7 +69,7 @@
 			function highlightWebsite(hlHTML) {
 				hlHTML = hlHTML.replace(/\&lt;script\&gt;[^]*?\&lt;\/script\&gt;|\&lt;style\&gt;[^]*?\&lt;\/style\&gt;|\&lt;[^]+?\&gt;|\&amp;[^;& \n]+?;/g, function (match) {
 					if (match.slice(0, 10) == "&lt;script") {
-						return highlightJavaScript(match);
+						return match;  //// highlightJavaScript(match);
 					} else if (match.slice(0, 9) == "&lt;style") {
 						return highlightCSS(match);
 					} else {
