@@ -69,7 +69,7 @@
 			function highlightWebsite(hlHTML) {
 				hlHTML = hlHTML.replace(/\&lt;script\&gt;[^]*?\&lt;\/script\&gt;|\&lt;style\&gt;[^]*?\&lt;\/style\&gt;|\&lt;[^]+?\&gt;|\&amp;[^;& \n]+?;/g, function (match) {
 					if (match.slice(0, 10) == "&lt;script") {
-						return match;  //// highlightJavaScript(match);
+						return highlightJavaScript(match);
 					} else if (match.slice(0, 9) == "&lt;style") {
 						return highlightCSS(match);
 					} else {
@@ -87,7 +87,9 @@
 				let hlHTML = S.getId("codeHighlighter").innerHTML;  // highlighted HTML (doesn't make the page repeatedly rerender)
 				clearTimeout(highlightTimeout);
 				highlightTimeout = setTimeout(function () {  // prevents performance issues from needing to refresh so much so often
-					hlHTML = highlightWebsite(hlHTML);
+					if (S.getId("highlightOption").checked) {
+						hlHTML = highlightWebsite(hlHTML);
+					}
 					S.getId("codeHighlighter").innerHTML = hlHTML;
 					if (updateLines) {
 						let selectedLines = [];
@@ -459,6 +461,10 @@
 				S.makeDialog(decodeURIComponent(M.session.list("../", { shallowKeyList: true }).join(", ")));
 			});
 
+
+			S.listen("highlightOption", "change", function () {
+				updateCode();
+			});
 
 			S.listen("codeDisplay", "keydown", function (event) {
 				if (event.key == "Enter") {
@@ -972,6 +978,9 @@
 					List projects
 				</button>
 			</div>
+			<br>
+			<input type="checkbox" id="highlightOption" checked>
+			<label for="highlightOption">Highlight the code</label>
 			<br>
 			<button id="preview" disabled>
 				View preview
