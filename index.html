@@ -83,7 +83,7 @@
 			}
 
 			function updateCode(updateLines) {
-				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
+				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").value;
 				let hlHTML = S.getId("codeHighlighter").innerHTML;  // highlighted HTML (doesn't make the page repeatedly rerender)
 				clearTimeout(highlightTimeout);
 				highlightTimeout = setTimeout(function () {  // prevents performance issues from needing to refresh so much so often
@@ -100,7 +100,7 @@
 						});
 						S.getId("lineNumbers").innerHTML = "";
 						let newLines = "";
-						S.forEach(S.getId("codeDisplay").textContent.split("\n").length, function (_, index) {
+						S.forEach(S.getId("codeDisplay").value.split("\n").length, function (_, index) {
 							if (selectedLines.includes(index + 1)) {
 								newLines += "<section class='line-number selected'>" + (index + 1) + "</section>";
 							} else {
@@ -342,7 +342,7 @@
 				html += '\t\t</main>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
-				S.getId("codeDisplay").textContent = html;
+				S.getId("codeDisplay").value = html;
 				S.getId("preview").disabled = false;
 				updateCode(true);
 			});
@@ -373,7 +373,7 @@
 				html += '\t\t<ul id="contentsList"></ul>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
-				S.getId("codeDisplay").textContent = html;
+				S.getId("codeDisplay").value = html;
 				updateCode(true);
 			});
 
@@ -381,7 +381,7 @@
 			S.listen("importCode", "click", function () {
 				new Promise(function () {
 					S.getFile(S.getId("codeURL").value, function (contents) {
-						S.getId("codeDisplay").textContent = contents;
+						S.getId("codeDisplay").value = contents;
 						updateCode(true);
 					}, false);
 				}).catch(function (error) {
@@ -408,7 +408,7 @@
 						M.session.defaultLocation = "websitebuilder/" + projectName;
 						M.local.defaultLocation = "websitebuilder/" + projectName;
 						M.server.defaultLocation = "/websitebuilder/" + projectName;
-						S.getId("codeDisplay").textContent = project.code;
+						S.getId("codeDisplay").value = project.code;
 						updateCode(true);
 					}
 				}
@@ -424,7 +424,7 @@
 					M.local.defaultLocation = "websitebuilder/" + projectName;
 					M.server.defaultLocation = "/websitebuilder/" + projectName;
 					let project = {};
-					project.code = S.getId("codeDisplay").textContent;
+					project.code = S.getId("codeDisplay").value;
 					project.language = "HTML";
 					project.lastUpdated = new Date().getTime();
 					M.local.store("./", project);
@@ -450,7 +450,7 @@
 							M.session.defaultLocation = "websitebuilder/Default";
 							M.local.defaultLocation = "websitebuilder/Default";
 							M.server.defaultLocation = "/websitebuilder/Default";
-							S.getId("codeDisplay").textContent = "";
+							S.getId("codeDisplay").value = "";
 							updateCode(true);
 							S.makeDialog("Project deleted.");
 						}], "No");
@@ -550,7 +550,7 @@
 						}
 					}
 				}
-				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
+				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").value;
 			});
 			S.listen("codeDisplay", "keyup", function (event) {
 				if (event.key == "Enter" || event.key == "Backspace") {
@@ -565,7 +565,7 @@
 			S.listen("preview", "click", function() {
 				var preview = window.open();
 				if (preview) {  // if pop-ups are allowed
-					preview.document.write(S.getId("codeDisplay").textContent);
+					preview.document.write(S.getId("codeDisplay").value);
 					preview.focus();
 				} else {
 					S.makeDialog(
@@ -600,7 +600,7 @@
 				S.getId("login").checked = true;
 				S.getId("advanced").innerHTML = "Show advanced choices";
 				S.getId("preview").disabled = true;
-				S.getId("codeDisplay").textContent = "";
+				S.getId("codeDisplay").value = "";
 				updateCode(true);
 			});
 
@@ -989,7 +989,7 @@
 			<br>
 			<div id="codeContainer">
 				<div id="codeHighlighter"></div>
-				<div id="codeDisplay" contenteditable="true"></div>
+				<textarea id="codeDisplay"></textarea>
 				<div id="lineNumbers">1</div>
 			</div>
 			<br>
