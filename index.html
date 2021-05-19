@@ -41,12 +41,10 @@
 				let commentColor = "green";
 				hlHTML = hlHTML.replace(/(\W)(var|let|function|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield|typeof|instanceof|throw)(?= |\(|\{|:)/g,
 					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>");  // colors JavaScript keywords
-				/*
 				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent)(?= |\.|\()/g,
 					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>");  // colors built-in JavaScript objects
 				hlHTML = hlHTML.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|Infinity|null|undefined)(?=\W)/g,
 					"$1<span class='highlighting' style='color:" + valueColor + "'>$2</span>");  // colors some values
-				*/
 				hlHTML = hlHTML.replace(/(<span.+?>)|(".*?"|'.*?')/g, function (match, tag, str) {  // colors strings
 					if (match == tag) {  // prevents putting spans within spans
 						return tag;
@@ -83,7 +81,7 @@
 			}
 
 			function updateCode(updateLines) {
-				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").value;
+				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
 				let hlHTML = S.getId("codeHighlighter").innerHTML;  // highlighted HTML (doesn't make the page repeatedly rerender)
 				clearTimeout(highlightTimeout);
 				highlightTimeout = setTimeout(function () {  // prevents performance issues from needing to refresh so much so often
@@ -100,7 +98,7 @@
 						});
 						S.getId("lineNumbers").innerHTML = "";
 						let newLines = "";
-						S.forEach(S.getId("codeDisplay").value.split("\n").length, function (_, index) {
+						S.forEach(S.getId("codeDisplay").textContent.split("\n").length, function (_, index) {
 							if (selectedLines.includes(index + 1)) {
 								newLines += "<section class='line-number selected'>" + (index + 1) + "</section>";
 							} else {
@@ -342,7 +340,7 @@
 				html += '\t\t</main>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
-				S.getId("codeDisplay").value = html;
+				S.getId("codeDisplay").textContent = html;
 				S.getId("preview").disabled = false;
 				updateCode(true);
 			});
@@ -373,7 +371,7 @@
 				html += '\t\t<ul id="contentsList"></ul>\n';
 				html += '\t</body>\n';
 				html += '</html>\n';
-				S.getId("codeDisplay").value = html;
+				S.getId("codeDisplay").textContent = html;
 				updateCode(true);
 			});
 
@@ -381,7 +379,7 @@
 			S.listen("importCode", "click", function () {
 				new Promise(function () {
 					S.getFile(S.getId("codeURL").value, function (contents) {
-						S.getId("codeDisplay").value = contents;
+						S.getId("codeDisplay").textContent = contents;
 						updateCode(true);
 					}, false);
 				}).catch(function (error) {
@@ -408,7 +406,7 @@
 						M.session.defaultLocation = "websitebuilder/" + projectName;
 						M.local.defaultLocation = "websitebuilder/" + projectName;
 						M.server.defaultLocation = "/websitebuilder/" + projectName;
-						S.getId("codeDisplay").value = project.code;
+						S.getId("codeDisplay").textContent = project.code;
 						updateCode(true);
 					}
 				}
@@ -424,7 +422,7 @@
 					M.local.defaultLocation = "websitebuilder/" + projectName;
 					M.server.defaultLocation = "/websitebuilder/" + projectName;
 					let project = {};
-					project.code = S.getId("codeDisplay").value;
+					project.code = S.getId("codeDisplay").textContent;
 					project.language = "HTML";
 					project.lastUpdated = new Date().getTime();
 					M.local.store("./", project);
@@ -450,7 +448,7 @@
 							M.session.defaultLocation = "websitebuilder/Default";
 							M.local.defaultLocation = "websitebuilder/Default";
 							M.server.defaultLocation = "/websitebuilder/Default";
-							S.getId("codeDisplay").value = "";
+							S.getId("codeDisplay").textContent = "";
 							updateCode(true);
 							S.makeDialog("Project deleted.");
 						}], "No");
@@ -550,7 +548,7 @@
 						}
 					}
 				}
-				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").value;
+				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
 			});
 			S.listen("codeDisplay", "keyup", function (event) {
 				if (event.key == "Enter" || event.key == "Backspace") {
@@ -565,7 +563,7 @@
 			S.listen("preview", "click", function() {
 				var preview = window.open();
 				if (preview) {  // if pop-ups are allowed
-					preview.document.write(S.getId("codeDisplay").value);
+					preview.document.write(S.getId("codeDisplay").textContent);
 					preview.focus();
 				} else {
 					S.makeDialog(
@@ -600,7 +598,7 @@
 				S.getId("login").checked = true;
 				S.getId("advanced").innerHTML = "Show advanced choices";
 				S.getId("preview").disabled = true;
-				S.getId("codeDisplay").value = "";
+				S.getId("codeDisplay").textContent = "";
 				updateCode(true);
 			});
 
@@ -989,7 +987,7 @@
 			<br>
 			<div id="codeContainer">
 				<div id="codeHighlighter"></div>
-				<textarea id="codeDisplay"></textarea>
+				<div id="codeDisplay" contenteditable="true"></div>
 				<div id="lineNumbers">1</div>
 			</div>
 			<br>
