@@ -553,6 +553,20 @@
 			S.listen("codeDisplay", "keyup", function (event) {
 				if (event.key == "Enter" || event.key == "Backspace") {
 					updateCode(true);
+				} else if (event.key == "," /*|| event.key == "."*/) {
+					let selection = window.getSelection();
+					let range = selection.getRangeAt(0);
+					let offset = range.startOffset;
+					if (this.textContent.slice(-3, offset) == ",,,") {
+						this.textContent = this.textContent.slice(0, offset - 3) + "\t" + this.textContent.slice(range.endOffset);  // replaces ",,," with "\t"
+						// puts the caret in the correct spot
+						let newRange = document.createRange();
+						newRange.setStart(this.childNodes[0], offset - 2);
+						newRange.collapse(true);
+						selection.removeAllRanges();
+						selection.addRange(newRange);
+					}
+					updateCode();
 				} else {
 					updateCode();
 				}
@@ -769,6 +783,13 @@
 			}
 			.highlighting .highlighting {
 				color: inherit !important;
+			}
+			.editable-code-line, .highlighted-code-line {
+				display: block;
+				width: 100%;
+				height: 1em;
+				color: inherit;
+				caret-color: inherit;
 			}
 			.line-number {
 				margin: 0em;
