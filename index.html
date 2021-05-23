@@ -504,7 +504,6 @@
 
 			S.listen("codeDisplay", "keydown", function (event) {
 				console.log2("Keydown");
-				console.log2(event);
 				if (event.key == "Enter") {
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -592,6 +591,7 @@
 			});
 			S.listen("codeDisplay", "keyup", function (event) {
 				console.log2("Keyup");
+				console.log2(event);
 				if (event.key == "Enter" || event.key == "Backspace") {
 					updateCode(true);
 				} else if (event.key == "," /*|| event.key == "."*/) {
