@@ -17,7 +17,13 @@
 				console.messages.push(message);
 			};
 			window.addEventListener("error", function (error) {
-				console.messages.push(JSON.stringify(error));
+				console.messages.push([
+					"Error {",
+					"Message: " + error.message,
+					"Location: " + error.filename.replace(/\//g, "<wbr>/") + ":" + error.lineno + ":" + error.colno,
+					/* "Stack: " + error.error.stack.replace(/\//g, "<wbr>/"), */
+					"}"
+				].join("<br>"));
 			});
 
 
@@ -387,7 +393,7 @@
 
 
 			S.listen("showConsole", "click", function () {
-				S.makeDialog(console.messages.join("<br><br>");
+				S.makeDialog(console.messages.join("<br><br>"));
 			});
 
 
@@ -575,7 +581,7 @@
 					let selection = window.getSelection();
 					let range = selection.getRangeAt(0);
 					let offset = range.startOffset;
-                    console.log(this.textContent.slice(-3, offset));
+					console.log2(this.textContent.slice(-3, offset));
 					if (this.textContent.slice(-3, offset) == ",,,") {
 						this.textContent = this.textContent.slice(0, offset - 3) + "\t" + this.textContent.slice(range.endOffset);  // replaces ",,," with "\t"
 						// puts the caret in the correct spot
