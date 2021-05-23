@@ -11,6 +11,16 @@
 		<script src="https://epicenterprograms.github.io/standards/behavior/firebaseinit.js"></script>
 		<script src="https://epicenterprograms.github.io/standards/behavior/storage.js"></script>
 		<script>
+			console.messages = [];
+			console.log2 = function (message) {
+				console.log(message);
+				console.messages.push(message);
+			};
+			window.addEventListener("error", function (error) {
+				console.messages.push(JSON.stringify(error));
+			});
+
+
 			var S = Standards.general;
 			var M = Standards.storage;
 			M.session.defaultLocation = "websitebuilder/Default";
@@ -976,6 +986,9 @@
 				<section>
 					Edit code here.
 				</section>
+				<button onclick="S.makeDialog(console.messages.join('<br><br>')">
+					View console
+				</button>
 				<input type="text" id="codeURL" placeholder="URL">
 				<button id="importCode">
 					Import code
