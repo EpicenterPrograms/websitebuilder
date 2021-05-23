@@ -593,7 +593,7 @@
 				let selection = window.getSelection();
 				let range = selection.getRangeAt(0);
 				let offset = range.startOffset;
-				if (key == "Undefined") {  // happens on mobile
+				if (key == "Unidentified") {  // happens on mobile
 					key = this.textContent.slice(offset - 1, offset);
 				}
 				console.log2(key);
