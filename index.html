@@ -11,10 +11,28 @@
 		<script src="https://epicenterprograms.github.io/standards/behavior/firebaseinit.js"></script>
 		<script src="https://epicenterprograms.github.io/standards/behavior/storage.js"></script>
 		<script>
+			var S = Standards.general;
+			var M = Standards.storage;
+			M.session.defaultLocation = "websitebuilder/Default";
+			M.local.defaultLocation = "websitebuilder/Default";
+			M.server.defaultLocation = "/websitebuilder/Default";
+
+
 			console.messages = [];
 			console.log2 = function (message) {
 				console.log(message);
-				console.messages.push(message);
+				if (S.getType(message) == "Array") {
+					console.messages.push("[\n" + message.join("\n") + "\n]");
+				} else if (message instanceof Object) {
+					let msg = "{\n";
+					for (const key in message) {
+						msg += key + ": " + message[key] + "\n";
+					}
+					msg += "}";
+					console.messages.push(msg);
+				} else {
+					console.messages.push(message);
+				}
 			};
 			window.addEventListener("error", function (error) {
 				console.messages.push([
@@ -23,15 +41,10 @@
 					"Location: " + error.filename.replace(/\//g, "<wbr>/") + ":" + error.lineno + ":" + error.colno,
 					/* "Stack: " + error.error.stack.replace(/\//g, "<wbr>/"), */
 					"}"
-				].join("<br>"));
+				].join("\n"));
 			});
 
 
-			var S = Standards.general;
-			var M = Standards.storage;
-			M.session.defaultLocation = "websitebuilder/Default";
-			M.local.defaultLocation = "websitebuilder/Default";
-			M.server.defaultLocation = "/websitebuilder/Default";
 			var html = "";
 			var highlightTimeout;
 			var projectName = "Default";
@@ -393,7 +406,11 @@
 
 
 			S.listen("showConsole", "click", function () {
-				S.makeDialog(console.messages.join("<br><br>"));
+				let list = [];
+				S.forEach(console.messages, function (item) {
+					list.push(item.replace(/\n/g, "<br>"));
+				});
+				S.makeDialog("<div style='text-align:left'>" + list.join("<br><br>") + "</div>", "Done");
 			});
 
 
@@ -487,7 +504,7 @@
 
 			S.listen("codeDisplay", "keydown", function (event) {
 				console.log2("Keydown");
-				console.log2(event.key);
+				console.log2(event);
 				if (event.key == "Enter") {
 					event.preventDefault();
 					let selection = window.getSelection();
