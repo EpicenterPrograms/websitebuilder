@@ -503,7 +503,6 @@
 			});
 
 			S.listen("codeDisplay", "keydown", function (event) {
-				console.log2("Keydown");
 				if (event.key == "Enter") {
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -590,16 +589,18 @@
 				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
 			});
 			S.listen("codeDisplay", "keyup", function (event) {
-				console.log2("Keyup");
-				console.log2(event);
-				if (event.key == "Enter" || event.key == "Backspace") {
+				let key = event.key;
+				let selection = window.getSelection();
+				let range = selection.getRangeAt(0);
+				let offset = range.startOffset;
+				if (key == "Undefined") {  // happens on mobile
+					key = this.textContent.slice(offset - 1, offset);
+				}
+				console.log2(key);
+				if (key == "Enter" || key == "Backspace") {
 					updateCode(true);
-				} else if (event.key == "," /*|| event.key == "."*/) {
-					let selection = window.getSelection();
-					let range = selection.getRangeAt(0);
-					let offset = range.startOffset;
-					console.log2(this.textContent.slice(-3, offset));
-					if (this.textContent.slice(-3, offset) == ",,,") {
+				} else if (key == "," /*|| key == "."*/) {
+					if (this.textContent.slice(offset - 3, offset) == ",,,") {
 						this.textContent = this.textContent.slice(0, offset - 3) + "\t" + this.textContent.slice(range.endOffset);  // replaces ",,," with "\t"
 						// puts the caret in the correct spot
 						let newRange = document.createRange();
