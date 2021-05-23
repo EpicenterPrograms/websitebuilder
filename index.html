@@ -68,7 +68,7 @@
 				let valueColor = "lightblue";
 				let quoteColor = "indianred";
 				let commentColor = "green";
-				hlHTML = hlHTML.replace(/(\W)(var|let|function|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield|typeof|instanceof|throw)(?= |\(|\{|:)/g,
+				hlHTML = hlHTML.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await)(?= |\(|\{|:)/g,
 					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>");  // colors JavaScript keywords
 				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent)(?= |\.|\()/g,
 					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>");  // colors built-in JavaScript objects
@@ -119,6 +119,9 @@
 					}
 					S.getId("codeHighlighter").innerHTML = hlHTML;
 					if (updateLines) {
+						if (S.getId("codeDisplay").textContent != "") {
+							S.getId("preview").disabled = false;
+						}
 						let selectedLines = [];
 						S.forEach(S.getClass("line-number"), function (num) {
 							if (num.className.includes("selected")) {
@@ -370,7 +373,6 @@
 				html += '\t</body>\n';
 				html += '</html>\n';
 				S.getId("codeDisplay").textContent = html;
-				S.getId("preview").disabled = false;
 				updateCode(true);
 			});
 
@@ -596,7 +598,6 @@
 				if (key == "Unidentified") {  // happens on mobile
 					key = this.textContent.slice(offset - 1, offset);
 				}
-				console.log2(key);
 				if (key == "Enter" || key == "Backspace") {
 					updateCode(true);
 				} else if (key == "," /*|| key == "."*/) {
@@ -615,18 +616,23 @@
 				}
 			});
 
-
+			
 
 			S.listen("preview", "click", function() {
 				var preview = window.open();
 				if (preview) {  // if pop-ups are allowed
-					preview.document.write(S.getId("codeDisplay").textContent);
+					let code = S.getId("codeDisplay").textContent;
+					preview.document.write(code);
+					if (code.search(/<script>[^]+?<\/script>/) > -1) {
+						preview.runJavaScript = function () {
+							preview.dispatchEvent(new Event("load"));  // makes sure the real page load isn't missed
+							preview.Function(code.match(/<script>([^]+?)<\/script>/)[1])();
+						}
+						preview.runJavaScript();
+					}
 					preview.focus();
 				} else {
-					S.makeDialog(
-						"You have to allow pop-ups<br>for the preview to appear.",
-						["Okay", function() {return;}]
-					);
+					S.makeDialog("You have to allow pop-ups<br>for the preview to appear.");
 				}
 			});
 
