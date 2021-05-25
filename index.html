@@ -13,9 +13,9 @@
 		<script>
 			var S = Standards.general;
 			var M = Standards.storage;
-			M.session.defaultLocation = "websitebuilder/Default";
-			M.local.defaultLocation = "websitebuilder/Default";
-			M.server.defaultLocation = "/websitebuilder/Default";
+			M.session.defaultLocation = "/websitebuilder";
+			M.local.defaultLocation = "/websitebuilder";
+			M.server.defaultLocation = "/websitebuilder";
 
 
 			console.messages = [];
@@ -439,13 +439,10 @@
 				} else if (projectName == "Default") {
 					S.makeDialog("No projects can use that name.");
 				} else {
-					let project = M.session.recall("../" + projectName + "/");
+					let project = M.session.recall(projectName + "/");
 					if (S.getType(project) == "Error") {
 						S.makeDialog("No project exists with that name.");
 					} else {
-						M.session.defaultLocation = "websitebuilder/" + projectName;
-						M.local.defaultLocation = "websitebuilder/" + projectName;
-						M.server.defaultLocation = "/websitebuilder/" + projectName;
 						S.getId("codeDisplay").textContent = project.code;
 						updateCode(true);
 					}
@@ -458,15 +455,15 @@
 				} else if (projectName == "Default") {
 					S.makeDialog("No projects can use that name.");
 				} else {
-					M.session.defaultLocation = "websitebuilder/" + projectName;
-					M.local.defaultLocation = "websitebuilder/" + projectName;
-					M.server.defaultLocation = "/websitebuilder/" + projectName;
 					let project = {};
 					project.code = S.getId("codeDisplay").textContent;
 					project.language = "HTML";
 					project.lastUpdated = new Date().getTime();
-					M.local.store("./", project);
-					M.session.store("./", project);
+					M.local.store(projectName + "/", project);
+					M.session.store(projectName + "/", project);
+					if (M.server.user) {
+						syncInformation();
+					}
 					S.makeDialog("Project saved.");
 				}
 			});
@@ -476,18 +473,15 @@
 					S.makeDialog("Specify a project name to delete.");
 				} else if (projectName == "Default") {
 					S.makeDialog("The default project can't be deleted.");
-				} else if (!M.session.list("../", { shallowKeyList: true }).includes(projectName)) {
+				} else if (!M.session.list("./", { shallowKeyList: true }).includes(projectName)) {
 					S.makeDialog("The specified project doesn't exist.");
 				} else {
 					S.makeDialog("Are you sure you want to delete this?",
 						["Yes", function () {
-							M.local.forget("/websitebuilder/" + projectName + "/");
-							M.session.forget("/websitebuilder/" + projectName + "/");
+							M.local.forget(projectName + "/");
+							M.session.forget(projectName + "/");
 							S.getId("projectName").value = "Default";
 							projectName = "Default";
-							M.session.defaultLocation = "websitebuilder/Default";
-							M.local.defaultLocation = "websitebuilder/Default";
-							M.server.defaultLocation = "/websitebuilder/Default";
 							S.getId("codeDisplay").textContent = "";
 							updateCode(true);
 							S.makeDialog("Project deleted.");
@@ -496,7 +490,7 @@
 			});
 
 			S.listen("listProjects", "click", function () {
-				S.makeDialog(decodeURIComponent(M.session.list("../", { shallowKeyList: true }).join(", ")));
+				S.makeDialog(decodeURIComponent(M.session.list("./", { shallowKeyList: true }).join(", ")));
 			});
 
 
@@ -693,73 +687,89 @@
 					S.getId("codeEditor").style.display = "block";
 				});
 
-				S.forEach(M.local.list("/websitebuilder/"), function (key) {
-					M.session.store("/websitebuilder/" + key, M.local.recall("/websitebuilder/" + key));
+				S.forEach(M.local.list(), function (key) {
+					M.session.store(key, M.local.recall(key));
 				});
 			});
 
-			/*
-			firebase.auth().onAuthStateChanged(function (person) {
-				if (person) {  // if the user is signed in
-					if (S.getType(M.local.recall("/websitebuilder/last synchronized")) == "Error") {
-						M.local.store("/websitebuilder/last synchronized", -Infinity);
-					}
-					let localSync = M.local.recall("/websitebuilder/last synchronized");
-					M.server.recall("/websitebuilder/last synchronized", function (serverSync) {
-						M.server.list("/websitebuilder/", function (serverProjects) {  // lists all of the user's projects (only the titles)
-							let remaining = new S.Listenable();
-							remaining.value = 1;
-							remaining.addEventListener("set", function (value) {
-								if (value == 0) {  // once all items have been successfully handled
-									M.session.forget("/");
-									S.forEach(M.local.list("/websitebuilder/"), function (name) {
-										M.session.store("/websitebuilder/" + name, M.local.recall("/websitebuilder/" + name));
-									});
-									S.makeDialog("Finished synchronizing.");
-								}
-							});
-							let localProjects = M.local.list("/websitebuilder/", { shallowKeyList: true });
-							S.forEach(serverProjects, function (name) {
+
+			function syncInformation() {
+				if (S.getType(M.local.recall("last synchronized")) == "Error") {
+					M.local.store("last synchronized", -Infinity);
+				}
+				let localSync = M.local.recall("last synchronized");
+				M.server.recall("last synchronized", function (serverSync) {
+					M.server.list("./", function (serverProjects) {  // lists all of the user's projects (only the titles)
+						let remaining = new S.Listenable();
+						remaining.value = 1;
+						remaining.addEventListener("set", function (value) {
+							if (value == 0) {  // once all items have been successfully handled
+								M.session.forget("/");
+								S.forEach(M.local.list(), function (name) {
+									M.session.store(name, M.local.recall(name));
+								});
+								S.makeDialog("Account data was synchronized.");
+							}
+						});
+						if (S.getType(serverSync) == "Error") {
+							serverSync = -Infinity;
+						}
+						let syncTime = new Date().getTime();
+						M.local.store("last synchronized", syncTime);
+						remaining.value++;
+						M.server.store("last synchronized", syncTime, function () { remaining.value--; });
+						let localProjects = M.local.list("./", { shallowKeyList: true });
+						S.forEach(serverProjects, function (name) {
+							if (name != "last synchronized") {
 								remaining.value++;
-								M.server.recall("/websitebuilder/" + name + "/", function (project) {
+								M.server.recall(name + "/", function (project) {
 									// stores the server version of the project if there isn't a local version or if the local version hasn't been updated as recently
 									// overwrites the server version if the local version has been updated more recently
-									if (!localProjects.includes(name) || M.local.recall("/websitebuilder/" + name + "/").lastUpdated < project.lastUpdated) {
-										M.local.store("/websitebuilder/" + name + "/", project);
+									if (!localProjects.includes(name) || M.local.recall(name + "/").lastUpdated < project.lastUpdated) {
+										M.local.store(name + "/", project);
 										remaining.value--;
-									} else if (M.local.recall("/websitebuilder/" + name + "/").lastUpdated > project.lastUpdated) {
-										M.server.store("/websitebuilder/" + name + "/", M.local.recall("/websitebuilder/" + name + "/"), function () {
+									} else if (M.local.recall(name + "/").lastUpdated > project.lastUpdated) {
+										M.server.store(name + "/", M.local.recall(name + "/"), function () {
 											remaining.value--;
 										});
 									} else {  // if the local version and the server version are the same
 										remaining.value--;
 									}
 								});
-							});
-							S.forEach(localProjects, function (name) {
-								// stores projects to the server if they've been added since the last synchronization
-								// deletes local projects if they've been deleted from the server
-								if (!serverProjects.includes(name) && M.local.recall("/websitebuilder/" + name + "/").lastUpdated > localSync) {
+							}
+						});
+						S.forEach(localProjects, function (name) {
+							// stores projects to the server if they've been added since the last synchronization
+							// deletes local projects if they've been deleted from the server
+							if (!serverProjects.includes(name)) {
+								let item = M.local.recall(name + "/");
+								if (item.lastUpdated > localSync) {
 									remaining.value++;
-									M.server.store("/websitebuilder/" + name + "/", M.local.recall("/websitebuilder/" + name + "/"), function () {
+									M.server.store(name + "/", item, function () {
 										remaining.value--;
 									});
 								} else {
-									M.local.forget("/websitebuilder/" + name + "/");
+									M.local.forget(name + "/");
 								}
-							});
-							remaining.value--;
-						}, { shallowKeyList: true });
-					}).catch(function (error) {
-						S.makeDialog("There was a problem retrieving your account's information.");
-						console.error("Synchronization failed");
-						console.error(error);
-					})
+							}
+						});
+						remaining.value--;
+					}, { shallowKeyList: true });
+				}).catch(function (error) {
+					S.makeDialog("There was a problem retrieving your account's information.");
+					console.error("Synchronization failed");
+					console.error(error);
+				});
+			}
+
+			firebase.auth().onAuthStateChanged(function (person) {
+				if (person) {  // if the user is signed in
+					syncInformation();
 				} else {
 					// do nothing (currently)
 				}
 			});
-			*/
+			
 		</script>
 		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">
 		<style>
