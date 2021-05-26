@@ -70,7 +70,7 @@
 				let commentColor = "green";
 				hlHTML = hlHTML.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await)(?= |\(|\{|:)/g,
 					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>");  // colors JavaScript keywords
-				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent)(?= |\.|\()/g,
+				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent|arguments)(?= |\.|\()/g,
 					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>");  // colors built-in JavaScript objects
 				hlHTML = hlHTML.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|Infinity|null|undefined)(?=\W)/g,
 					"$1<span class='highlighting' style='color:" + valueColor + "'>$2</span>");  // colors some values
@@ -689,7 +689,12 @@
 				});
 
 				S.forEach(M.local.list(), function (key) {
-					M.session.store(key, M.local.recall(key));
+					if (key[0] == "/") {  ////
+						localStorage.removeItem(key);
+						localStorage.removeItem("/" + key);
+					} else {
+						M.session.store(key, M.local.recall(key));
+					}
 				});
 			});
 
@@ -724,9 +729,17 @@
 							if (name != "last synchronized") {
 								remaining.value++;
 								M.server.recall(name + "/", function (project) {
+									// deletes projects deleted since the last synchronization
 									// stores the server version of the project if there isn't a local version or if the local version hasn't been updated as recently
 									// overwrites the server version if the local version has been updated more recently
-									if (!localProjects.includes(name) || M.local.recall(name + "/").lastUpdated < project.lastUpdated) {
+									if (!localProjects.includes(name)) {
+										if (localSync == serverSync) {  // if the project was deleted since the most recent synchronization
+											M.server.forget(name + "/", function () { remaining.value--; });
+										} else {  // if the project was created on the server since the last synchronization (localSync < serverSync)
+											M.local.store(name + "/", project);
+											remaining.value--;
+										}
+									} else if (M.local.recall(name + "/").lastUpdated < project.lastUpdated) {
 										M.local.store(name + "/", project);
 										remaining.value--;
 									} else if (M.local.recall(name + "/").lastUpdated > project.lastUpdated) {
