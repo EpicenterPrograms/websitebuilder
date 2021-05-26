@@ -479,7 +479,12 @@
 					S.makeDialog("Are you sure you want to delete this?",
 						["Yes", function () {
 							M.local.forget(projectName + "/");
-							M.session.forget(projectName + "/");
+                            M.session.forget(projectName + "/");
+                            if (M.server.user) {
+								M.server.forget(projectName + "/", function () {
+									S.makeDialog("Project deleted from account.");
+								});
+                            }
 							S.getId("projectName").value = "Default";
 							projectName = "Default";
 							S.getId("codeDisplay").textContent = "";
@@ -490,8 +495,14 @@
 			});
 
 			S.listen("listProjects", "click", function () {
-				console.log2(M.session.list("./"));
-				S.makeDialog(decodeURIComponent(M.session.list("./", { shallowKeyList: true }).join(", ")));
+				console.log2(M.session.list());
+				let list = [];
+				S.forEach(M.session.list("./", { shallowKeyList: true }), function (name) {
+					if (name != "last synchronized") {
+						list.push(decodeURIComponent(name));
+					}
+				});
+				S.makeDialog(list.join(", "));
 			});
 
 
