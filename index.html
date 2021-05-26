@@ -13,8 +13,8 @@
 		<script>
 			var S = Standards.general;
 			var M = Standards.storage;
-			M.session.defaultLocation = "websitebuilder/";
-			M.local.defaultLocation = "websitebuilder/";
+			M.session.defaultLocation = "/websitebuilder/";
+			M.local.defaultLocation = "/websitebuilder/";
 			M.server.defaultLocation = "/websitebuilder/";
 
 
@@ -490,6 +490,7 @@
 			});
 
 			S.listen("listProjects", "click", function () {
+				console.log2(M.session.list("./"));
 				S.makeDialog(decodeURIComponent(M.session.list("./", { shallowKeyList: true }).join(", ")));
 			});
 
