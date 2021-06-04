@@ -621,6 +621,11 @@
 					updateCode();
 				}
 			});
+			S.listen("codeDisplay", "paste", function () {
+				setTimeout(function () {  // wait until the contents are actually pasted
+					updateCode(true);
+				}, 0);
+			});
 
 			
 
