@@ -18,33 +18,6 @@
 			M.server.defaultLocation = "/websitebuilder/";
 
 
-			console.messages = [];
-			console.log2 = function (message) {
-				console.log(message);
-				if (S.getType(message) == "Array") {
-					console.messages.push("[\n" + message.join("\n") + "\n]");
-				} else if (message instanceof Object) {
-					let msg = "{\n";
-					for (const key in message) {
-						msg += key + ": " + message[key] + "\n";
-					}
-					msg += "}";
-					console.messages.push(msg);
-				} else {
-					console.messages.push(message);
-				}
-			};
-			window.addEventListener("error", function (error) {
-				console.messages.push([
-					"Error {",
-					"Message: " + error.message,
-					"Location: " + error.filename.replace(/\//g, "<wbr>/") + ":" + error.lineno + ":" + error.colno,
-					/* "Stack: " + error.error.stack.replace(/\//g, "<wbr>/"), */
-					"}"
-				].join("\n"));
-			});
-
-
 			var html = "";
 			var highlightTimeout;
 			var projectName = "Default";
@@ -70,7 +43,7 @@
 				let commentColor = "green";
 				hlHTML = hlHTML.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await)(?= |\(|\{|:)/g,
 					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>");  // colors JavaScript keywords
-				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent|arguments)(?= |\.|\()/g,
+				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent|arguments|opener|self)(?= |\.|\()/g,
 					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>");  // colors built-in JavaScript objects
 				hlHTML = hlHTML.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|Infinity|null|undefined)(?=\W)/g,
 					"$1<span class='highlighting' style='color:" + valueColor + "'>$2</span>");  // colors some values
@@ -108,6 +81,17 @@
 				});
 				return hlHTML;
 			}
+			function highlightLine(line) {
+				if (line.className.includes("HTML")) {
+					return highlightHTML(line.textContent);
+				} else if (line.className.includes("JavaScript")) {
+					return highlightJavaScript(line.textContent);
+				} else if (line.className.includes("CSS")) {
+					return highlightCSS(line.textContent);
+				} else {
+					//// error
+                }
+            }
 
 			function updateCode(updateLines) {
 				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
@@ -407,12 +391,14 @@
 			});
 
 
-			S.listen("showConsole", "click", function () {
-				let list = [];
-				S.forEach(console.messages, function (item) {
-					list.push(item.replace(/\n/g, "<br>"));
-				});
-				S.makeDialog("<div style='text-align:left'>" + list.join("<br><br>") + "</div>", "Done");
+            S.listen("showConsole", "click", function () {
+                let log = "<div style='text-align:left; white-space:pre; tab-size:6;'>";
+                log += console.messages.join("\n\n").replace(/\n/g, "<br>").replace(/\//g, "<wbr>/");
+                log += "</div>";
+                log = log.replace(/Warning \{[^]+?\}/g, "<span style='color:orange'>$&</span>");
+                log = log.replace(/Error \{[^]+?\}/g, "<span style='color:red'>$&</span>");
+                log = log.replace(/Info \{[^]+?\}/g, "<span style='color:blue'>$&</span>");
+                S.makeDialog(log, "Done");
 			});
 
 
@@ -476,7 +462,7 @@
 				} else if (!M.session.list("./", { shallowKeyList: true }).includes(projectName)) {
 					S.makeDialog("The specified project doesn't exist.");
 				} else {
-					S.makeDialog("Are you sure you want to delete this?",
+					S.makeDialog("Are you sure you want to delete this project?",
 						["Yes", function () {
 							M.local.forget(projectName + "/");
                             M.session.forget(projectName + "/");
@@ -495,7 +481,6 @@
 			});
 
 			S.listen("listProjects", "click", function () {
-				console.log2(M.session.list());
 				let list = [];
 				S.forEach(M.session.list("./", { shallowKeyList: true }), function (name) {
 					if (name != "last synchronized") {
@@ -512,6 +497,20 @@
 
 			S.listen("codeDisplay", "keydown", function (event) {
 				if (event.key == "Enter") {
+					/*
+                    event.preventDefault();
+                    let selection = window.getSelection();
+                    let range = selection.getRangeAt(0);
+					let offset = range.startOffset;
+					let container = range.startContainer;
+					let editableLine = document.createElement("span");
+					editableLine.className = "editable-code-line";
+					editableLine.textContent = container.textContent.slice(offset);
+					let shownLine = document.createElement("span");
+					shownLine.className = "highlighted-code-line";
+					shownLine.innerHTML = highlightLine(editableLine.textContent);
+					//// insert to page
+					/*/
 					event.preventDefault();
 					let selection = window.getSelection();
 					let range = selection.getRangeAt(0);
@@ -525,7 +524,7 @@
 						} else {
 							tabs = tabs[0];
 						}
-						if (S.itemAt(beforeNewLine, -1) == "{" || S.itemAt(beforeNewLine, -1) == ">" && !beforeNewLine.slice(beforeNewLine.lastIndexOf("<")).includes("/")) {  // if the new line comes after an opening curly brace or an opening HTML tag
+                        if (S.itemAt(beforeNewLine, -1) == "{" || S.itemAt(beforeNewLine, -1) == ":" || S.itemAt(beforeNewLine, -1) == ">" && !beforeNewLine.slice(beforeNewLine.lastIndexOf("<")).includes("/")) {  // if the new line comes after an opening curly brace, a colon, or an opening HTML tag
 							tabs += "\t";
 						}
 					}
@@ -536,6 +535,7 @@
 					newRange.collapse(true);
 					selection.removeAllRanges();
 					selection.addRange(newRange);
+					//*/
 				} else if (event.key == "Tab") {
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -629,6 +629,9 @@
 				if (preview) {  // if pop-ups are allowed
 					let code = S.getId("codeDisplay").textContent;
 					preview.document.write(code);
+					preview.addEventListener("console written", function () {
+						console.messages.push(S.itemAt(preview.console.messages, -1));
+					});
 					if (code.search(/<script>[^]+?<\/script>/) > -1) {
 						preview.runJavaScript = function () {
 							preview.dispatchEvent(new Event("load"));  // makes sure the real page load isn't missed
@@ -672,8 +675,6 @@
 			});
 
 			S.onLoad(function () {
-				console.log2("Page loaded");
-
 				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
 					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
@@ -872,6 +873,7 @@
 			}
 			.editable-code-line, .highlighted-code-line {
 				display: block;
+				outline: none;
 				width: 100%;
 				height: 1em;
 				color: inherit;
@@ -1065,6 +1067,9 @@
 				<button id="showConsole">
 					View console
 				</button>
+				<button onclick="console.clear()">
+					Clear console
+				</button>
 				<br>
 				<input type="text" id="codeURL" placeholder="URL">
 				<button id="importCode">
@@ -1098,7 +1103,7 @@
 			<br>
 			<div id="codeContainer">
 				<div id="codeHighlighter"></div>
-				<div id="codeDisplay" contenteditable="true"></div>
+				<div id="codeDisplay" contenteditable="true"><!--<span class="editable-code-line HTML" contenteditable="true"></span>--></div>
 				<div id="lineNumbers">1</div>
 			</div>
 			<br>
