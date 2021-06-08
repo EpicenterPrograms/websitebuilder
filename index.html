@@ -740,7 +740,9 @@
 							if (value == 0) {  // once all items have been successfully handled
 								M.session.forget("/");
 								S.forEach(M.local.list(), function (name) {
-									M.session.store(name, M.local.recall(name));
+									if (name != "last viewed") {
+										M.session.store(name, M.local.recall(name));
+									}
 								});
 								S.makeDialog("Account data was synchronized.");
 							}
@@ -783,7 +785,7 @@
 						S.forEach(localProjects, function (name) {
 							// stores projects to the server if they've been added since the last synchronization
 							// deletes local projects if they've been deleted from the server
-							if (!serverProjects.includes(name)) {
+							if (!serverProjects.includes(name) && name != "last viewed") {
 								let item = M.local.recall(name + "/");
 								if (item.lastUpdated > localSync) {
 									remaining.value++;
