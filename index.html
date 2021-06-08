@@ -6,6 +6,9 @@
 		</title>
 		<base target="_blank">
 		<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></script>
+		<!--
+		<script src="file:///C:/Users/rtben/Documents/GitHub/standards/behavior/general.js"></script>
+		-->
 		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-firestore.js"></script>
 		<script src="https://epicenterprograms.github.io/standards/behavior/firebaseinit.js"></script>
@@ -41,7 +44,7 @@
 				let valueColor = "lightblue";
 				let quoteColor = "indianred";
 				let commentColor = "green";
-				hlHTML = hlHTML.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await)(?= |\(|\{|:)/g,
+				hlHTML = hlHTML.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await)(?= |\(|\{|:|;)/g,
 					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>");  // colors JavaScript keywords
 				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent|arguments|opener|self)(?= |\.|\()/g,
 					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>");  // colors built-in JavaScript objects
@@ -90,8 +93,8 @@
 					return highlightCSS(line.textContent);
 				} else {
 					//// error
-                }
-            }
+				}
+			}
 
 			function updateCode(updateLines) {
 				S.getId("codeHighlighter").textContent = S.getId("codeDisplay").textContent;
@@ -391,14 +394,14 @@
 			});
 
 
-            S.listen("showConsole", "click", function () {
-                let log = "<div style='text-align:left; white-space:pre; tab-size:6;'>";
-                log += console.messages.join("\n\n").replace(/\n/g, "<br>").replace(/\//g, "<wbr>/");
-                log += "</div>";
-                log = log.replace(/Warning \{[^]+?\}/g, "<span style='color:orange'>$&</span>");
-                log = log.replace(/Error \{[^]+?\}/g, "<span style='color:red'>$&</span>");
-                log = log.replace(/Info \{[^]+?\}/g, "<span style='color:blue'>$&</span>");
-                S.makeDialog(log, "Done");
+			S.listen("showConsole", "click", function () {
+				let log = "<div style='text-align:left; white-space:pre; tab-size:6;'>";
+				log += console.messages.join("\n\n").replace(/\n/g, "<br>").replace(/\//g, "<wbr>/");
+				log += "</div>";
+				log = log.replace(/Warning \{[^]+?\}/g, "<span style='color:orange'>$&</span>");
+				log = log.replace(/Error \{[^]+?\}/g, "<span style='color:red'>$&</span>");
+				log = log.replace(/Info \{[^]+?\}/g, "<span style='color:blue'>$&</span>");
+				S.makeDialog(log, "Done");
 			});
 
 
@@ -465,12 +468,12 @@
 					S.makeDialog("Are you sure you want to delete this project?",
 						["Yes", function () {
 							M.local.forget(projectName + "/");
-                            M.session.forget(projectName + "/");
-                            if (M.server.user) {
+							M.session.forget(projectName + "/");
+							if (M.server.user) {
 								M.server.forget(projectName + "/", function () {
 									S.makeDialog("Project deleted from account.");
 								});
-                            }
+							}
 							S.getId("projectName").value = "Default";
 							projectName = "Default";
 							S.getId("codeDisplay").textContent = "";
@@ -498,9 +501,9 @@
 			S.listen("codeDisplay", "keydown", function (event) {
 				if (event.key == "Enter") {
 					/*
-                    event.preventDefault();
-                    let selection = window.getSelection();
-                    let range = selection.getRangeAt(0);
+					event.preventDefault();
+					let selection = window.getSelection();
+					let range = selection.getRangeAt(0);
 					let offset = range.startOffset;
 					let container = range.startContainer;
 					let editableLine = document.createElement("span");
@@ -524,7 +527,7 @@
 						} else {
 							tabs = tabs[0];
 						}
-                        if (S.itemAt(beforeNewLine, -1) == "{" || S.itemAt(beforeNewLine, -1) == ":" || S.itemAt(beforeNewLine, -1) == ">" && !beforeNewLine.slice(beforeNewLine.lastIndexOf("<")).includes("/")) {  // if the new line comes after an opening curly brace, a colon, or an opening HTML tag
+						if (["{", "[", "(", ":"].includes(S.itemAt(beforeNewLine, -1)) || S.itemAt(beforeNewLine, -1) == ">" && !beforeNewLine.slice(beforeNewLine.lastIndexOf("<")).includes("/")) {  // if the new line comes after one of the items in the array or an opening HTML tag
 							tabs += "\t";
 						}
 					}
@@ -680,6 +683,7 @@
 			});
 
 			S.onLoad(function () {
+				// gives the top-nav buttons functionality
 				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
 					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
@@ -687,6 +691,7 @@
 					S.getId("navigationBuilder").style.display = "none";
 					S.getId("codeEditor").style.display = "none";
 					S.getId("websiteBuilder").style.display = "block";
+					M.local.store("last viewed", "Websites");
 				});
 				S.getTag("nav")[0].getElementsByTagName("button")[1].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
@@ -695,6 +700,7 @@
 					S.getId("websiteBuilder").style.display = "none";
 					S.getId("codeEditor").style.display = "none";
 					S.getId("navigationBuilder").style.display = "block";
+					M.local.store("last viewed", "Navigation");
 				});
 				S.getTag("nav")[0].getElementsByTagName("button")[2].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
@@ -703,13 +709,18 @@
 					S.getId("websiteBuilder").style.display = "none";
 					S.getId("navigationBuilder").style.display = "none";
 					S.getId("codeEditor").style.display = "block";
+					M.local.store("last viewed", "Editor");
 				});
+				// sets the screen to be displayed (based on the last screen viewed)
+				if (S.getType(M.local.recall("last viewed")) == "Error") {
+					M.local.store("last viewed", "Websites");
+				} else {
+					S.getTag("nav")[0].getElementsByTagName("button")[["Websites", "Navigation", "Editor"].indexOf(M.local.recall("last viewed"))].click();
+				}
 
+				// saves the locally stored information into the session storage
 				S.forEach(M.local.list(), function (key) {
-					if (key[0] == "/") {  ////
-						localStorage.removeItem(key);
-						localStorage.removeItem("/" + key);
-					} else {
+					if (key != "last viewed") {
 						M.session.store(key, M.local.recall(key));
 					}
 				});
