@@ -728,6 +728,9 @@
 
 
 			function syncInformation() {
+				console.log(M.server.user);
+				M.server.list("./", function (list) { console.log(list); });
+				M.server.list("/", function (list) { console.log(list); });
 				if (S.getType(M.local.recall("last synchronized")) == "Error") {
 					M.local.store("last synchronized", -Infinity);
 				}
@@ -808,6 +811,7 @@
 
 			firebase.auth().onAuthStateChanged(function (person) {
 				if (person) {  // if the user is signed in
+					console.log(person);
 					syncInformation();
 				} else {
 					// do nothing (currently)
