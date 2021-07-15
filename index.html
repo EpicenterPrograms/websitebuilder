@@ -728,6 +728,7 @@
 
 
 			function syncInformation() {
+				console.log("Syncing information");
 				console.log(M.server.user);
 				M.server.list("./", function (list) { console.log(list); });
 				M.server.list("/", function (list) { console.log(list); });
@@ -810,6 +811,7 @@
 			}
 
 			firebase.auth().onAuthStateChanged(function (person) {
+				console.log("Auth state changed");
 				if (person) {  // if the user is signed in
 					console.log(person);
 					syncInformation();
