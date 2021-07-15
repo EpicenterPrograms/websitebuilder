@@ -730,7 +730,7 @@
 			function syncInformation() {
 				console.log("Syncing information");
 				console.log(M.server.user);
-				console.log(M.server.getReference(M.server.formatLocation("./"))["__name__"]);
+				console.log(M.server.getReference(M.server.formatLocation("./")));
 				M.server.list("./", function (list) { console.log(list); });
 				if (S.getType(M.local.recall("last synchronized")) == "Error") {
 					M.local.store("last synchronized", -Infinity);
