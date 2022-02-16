@@ -682,7 +682,7 @@
 				updateCode(true);
 			});
 
-			S.onLoad(function () {
+			window.addEventListener("load", function () {
 				// gives the top-nav buttons functionality
 				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
 					this.style.background = "lightsteelblue";
@@ -713,8 +713,9 @@
 				});
 				// sets the screen to be displayed
 				if (window.location.href.includes("?")) {  // if there's a URL extension specifying a screen
-					let section = window.location.href.slice(window.location.href.indexOf("?s=") + 3);
-					if (["Websites", "Navigation", "Editor"].includes(section)) {  // if a valid section was provided
+					let section = window.location.href.slice(window.location.href.indexOf("?s=") + 3).toLowerCase();
+					if (["websites", "navigation", "editor"].includes(section)) {  // if a valid section was provided
+						section = section[0].toUpperCase() + section.slice(1);
 						S.getTag("nav")[0].getElementsByTagName("button")[["Websites", "Navigation", "Editor"].indexOf(section)].click();
 						M.local.store("last viewed", section);
 					} else {
