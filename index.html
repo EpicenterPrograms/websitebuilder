@@ -26,6 +26,63 @@
 			var projectName = "Default";
 
 
+
+			window.addEventListener("load", function () {
+				// gives the top-nav buttons functionality
+				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
+					this.style.background = "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[2].style.background = "darkblue";
+					S.getId("navigationBuilder").style.display = "none";
+					S.getId("codeEditor").style.display = "none";
+					S.getId("websiteBuilder").style.display = "block";
+					M.local.store("last viewed", "Websites");
+				});
+				S.getTag("nav")[0].getElementsByTagName("button")[1].addEventListener("click", function () {
+					this.style.background = "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[2].style.background = "darkblue";
+					S.getId("websiteBuilder").style.display = "none";
+					S.getId("codeEditor").style.display = "none";
+					S.getId("navigationBuilder").style.display = "block";
+					M.local.store("last viewed", "Navigation");
+				});
+				S.getTag("nav")[0].getElementsByTagName("button")[2].addEventListener("click", function () {
+					this.style.background = "lightsteelblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
+					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
+					S.getId("websiteBuilder").style.display = "none";
+					S.getId("navigationBuilder").style.display = "none";
+					S.getId("codeEditor").style.display = "block";
+					M.local.store("last viewed", "Editor");
+				});
+				// sets the screen to be displayed
+				if (window.location.href.includes("?")) {  // if there's a URL extension specifying a screen
+					let section = window.location.href.slice(window.location.href.indexOf("?s=") + 3).toLowerCase();
+					if (["websites", "navigation", "editor"].includes(section)) {  // if a valid section was provided
+						section = section[0].toUpperCase() + section.slice(1);
+						S.getTag("nav")[0].getElementsByTagName("button")[["Websites", "Navigation", "Editor"].indexOf(section)].click();
+						M.local.store("last viewed", section);
+					} else {
+						M.local.store("last viewed", "Websites");
+					}
+				} else {
+					if (S.getType(M.local.recall("last viewed")) == "Error") {  // if there isn't information on the section viewed last time
+						M.local.store("last viewed", "Websites");
+					} else {
+						S.getTag("nav")[0].getElementsByTagName("button")[["Websites", "Navigation", "Editor"].indexOf(M.local.recall("last viewed"))].click();
+					}
+				}
+
+				// saves the locally stored information into the session storage
+				S.forEach(M.local.list(), function (key) {
+					if (key != "last viewed") {
+						M.session.store(key, M.local.recall(key));
+					}
+				});
+			});
+
+
 			function highlightHTML(hlHTML) {
 				let tagNameColor = "blue";
 				let outerTagColor = "darkcyan";
@@ -680,61 +737,6 @@
 				S.getId("preview").disabled = true;
 				S.getId("codeDisplay").textContent = "";
 				updateCode(true);
-			});
-
-			window.addEventListener("load", function () {
-				// gives the top-nav buttons functionality
-				S.getTag("nav")[0].getElementsByTagName("button")[0].addEventListener("click", function () {
-					this.style.background = "lightsteelblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[2].style.background = "darkblue";
-					S.getId("navigationBuilder").style.display = "none";
-					S.getId("codeEditor").style.display = "none";
-					S.getId("websiteBuilder").style.display = "block";
-					M.local.store("last viewed", "Websites");
-				});
-				S.getTag("nav")[0].getElementsByTagName("button")[1].addEventListener("click", function () {
-					this.style.background = "lightsteelblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[2].style.background = "darkblue";
-					S.getId("websiteBuilder").style.display = "none";
-					S.getId("codeEditor").style.display = "none";
-					S.getId("navigationBuilder").style.display = "block";
-					M.local.store("last viewed", "Navigation");
-				});
-				S.getTag("nav")[0].getElementsByTagName("button")[2].addEventListener("click", function () {
-					this.style.background = "lightsteelblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[0].style.background = "darkblue";
-					S.getTag("nav")[0].getElementsByTagName("button")[1].style.background = "darkblue";
-					S.getId("websiteBuilder").style.display = "none";
-					S.getId("navigationBuilder").style.display = "none";
-					S.getId("codeEditor").style.display = "block";
-					M.local.store("last viewed", "Editor");
-				});
-				// sets the screen to be displayed
-				if (window.location.href.includes("?")) {  // if there's a URL extension specifying a screen
-					let section = window.location.href.slice(window.location.href.indexOf("?s=") + 3).toLowerCase();
-					if (["websites", "navigation", "editor"].includes(section)) {  // if a valid section was provided
-						section = section[0].toUpperCase() + section.slice(1);
-						S.getTag("nav")[0].getElementsByTagName("button")[["Websites", "Navigation", "Editor"].indexOf(section)].click();
-						M.local.store("last viewed", section);
-					} else {
-						M.local.store("last viewed", "Websites");
-					}
-				} else {
-					if (S.getType(M.local.recall("last viewed")) == "Error") {  // if there isn't information on the section viewed last time
-						M.local.store("last viewed", "Websites");
-					} else {
-						S.getTag("nav")[0].getElementsByTagName("button")[["Websites", "Navigation", "Editor"].indexOf(M.local.recall("last viewed"))].click();
-					}
-				}
-
-				// saves the locally stored information into the session storage
-				S.forEach(M.local.list(), function (key) {
-					if (key != "last viewed") {
-						M.session.store(key, M.local.recall(key));
-					}
-				});
 			});
 
 
