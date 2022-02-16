@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+	<head>
+		<title>
+			Website Builder
+		</title>
+		<base target="_blank">
+		<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-firestore.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/firebaseinit.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/storage.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/game.js"></script>
+		<script src="https://epicenterprograms.github.io/standards/behavior/presentation.js"></script>
+		<!-- The extra script imports are in case the website being investigated uses them. -->
+		<script>
+			var S = Standards.general;
+			var M = Standards.storage;
+			M.session.defaultLocation = "/websitebuilder/";
+			M.local.defaultLocation = "/websitebuilder/";
+			M.server.defaultLocation = "/websitebuilder/";
+
+			window.addEventListener("load", function () {
+				document.getElementById("loadPage").addEventListener("click", function () {
+					new Promise(function () {
+						S.getFile(document.getElementById("codeURL").value, function (contents) {
+							let preview = window.open();
+							if (preview) {  // if pop-ups are allowed
+								preview.window.Standards = Standards;
+								preview.document.write(contents);
+								preview.addEventListener("console written", function () {
+									console.messages.push(preview.console.messages.slice(-1)[0]);
+								});
+								if (contents.search(/<script>[^]+?<\/script>/) > -1) {
+									preview.runJavaScript = function () {
+										preview.dispatchEvent(new Event("load"));  // makes sure the real page load isn't missed
+										preview.Function(contents.match(/<script>([^]+?)<\/script>/)[1])();
+									}
+									preview.runJavaScript();
+								}
+								preview.focus();
+							} else {
+								S.makeDialog("You have to allow pop-ups<br>for the preview to appear.");
+							}
+						}, false);
+					}).catch(function (error) {
+						console.error("The file couldn't be retrieved.");
+						console.error(error);
+						S.makeDialog("The file couldn't be retrieved.");
+					});
+				});
+
+				document.getElementById("showConsole").addEventListener("click", function () {
+					let log = console.messages.join("\n\n");
+					log = log.replace(/</g, "&lt;");
+					log = log.replace(/>/g, "&gt;");
+					log = log.replace(/\n/g, "<br>");
+					log = log.replace(/\//g, "<wbr>/");
+					log = log.replace(/Warning \{[^]+?\}/g, "<span style='color:orange'>$&</span>");
+					log = log.replace(/Error \{[^]+?\}/g, "<span style='color:red'>$&</span>");
+					log = log.replace(/Info \{[^]+?\}/g, "<span style='color:blue'>$&</span>");
+					document.getElementById("consoleOutput").innerHTML = log;
+				});
+
+				document.getElementById("clearConsole").addEventListener("click", function () {
+					console.clear();
+					document.getElementById("consoleOutput").innerHTML = "";
+				});
+			});
+		</script>
+		<link rel="stylesheet" href="https://epicenterprograms.github.io/standards/formatting/foundation.css">
+		<style>
+			#consoleOutput {
+				text-align: left;
+				white-space: pre;
+				tab-size: 6;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 class="main-title">
+			Simple error logger
+		</h1>
+		<main>
+			<input type="text" id="codeURL" placeholder="URL">
+			<button id="loadPage">
+				Load webpage
+			</button>
+			<br>
+			<button id="showConsole">
+				View console
+			</button>
+			<button id="clearConsole">
+				Clear console
+			</button>
+			<br>
+			<div id="consoleOutput"></div>
+		</main>
+	</body>
+</html>
