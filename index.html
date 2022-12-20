@@ -27,6 +27,7 @@
 			var html = "";
 			var highlightTimeout;
 			var projectName = "Default";
+			var projectLanguage = "HTML";
 
 
 
@@ -86,50 +87,57 @@
 			});
 
 
-			function highlightHTML(hlHTML) {
-				let tagNameColor = "blue";
-				let outerTagColor = "darkcyan";
-				let tagRemainderColor = "cyan";
-				let HTMLCharColor = "lightgreen";
-				let commentColor = "green";
-				hlHTML = hlHTML.replace(/(\&lt;(?!!--)\/?)([^ \n&]+)(.*?)(\&gt;)/g,
-					"<span class='highlighting' style='color:" + outerTagColor + "'>$1</span><span class='highlighting' style='color:" + tagNameColor + "'>$2</span><span class='highlighting' style='color:" + tagRemainderColor + "'>$3</span><span class='highlighting' style='color:" + outerTagColor + "'>$4</span>");  // colors the outer and inner parts of the HTML tags
-				hlHTML = hlHTML.replace(/\&amp;[^;& \n]+?;/g, "<span class='highlighting' style='color:" + HTMLCharColor + "'>$&</span>"); // colors HTML escape sequences
-				hlHTML = hlHTML.replace(/\&lt;!--[^]*?--\&gt;/g, "<span class='highlighting' style='color:" + commentColor + "'>$&</span>");  // colors HTML comments
+			function highlightHTML(code, classes) {
+				let hlHTML = code;
+				if (classes && classes.includes("comment")) {
+					hlHTML = hlHTML.replace(/^[^]*$/g, "<span class='highlighting comment'>$&</span>");  // colors comments
+				} else {
+					hlHTML = hlHTML.replace(/(\&lt;(?!!--)\/?)([^ \n\r&]+)(.*?)(\&gt;)/g,
+						"<span class='highlighting outer-tag'>$1</span><span class='highlighting tag-name'>$2</span><span class='highlighting tag-extras'>$3</span><span class='highlighting outer-tag'>$4</span>");  // colors the outer and inner parts of the HTML tags
+					hlHTML = hlHTML.replace(/\&amp;[^;& \n\r]+?;/g, "<span class='highlighting HTML-char'>$&</span>");  // colors HTML escape sequences
+					hlHTML = hlHTML.replace(/\&lt;!--[^]*?--\&gt;/g, "<span class='highlighting comment'>$&</span>");  // colors HTML comments
+				}
 				return hlHTML;
 			}
-			function highlightJavaScript(hlHTML) {
-				let keywordColor = "blue";
-				let builtInColor = "orange";
-				let valueColor = "lightblue";
-				let quoteColor = "indianred";
-				let commentColor = "green";
-				hlHTML = hlHTML.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await)(?= |\(|\{|:|;)/g,
-					"$1<span class='highlighting' style='color:" + keywordColor + "'>$2</span>");  // colors JavaScript keywords
-				hlHTML = hlHTML.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent|arguments|opener|self)(?= |\.|\()/g,
-					"$1<span class='highlighting' style='color:" + builtInColor + "'>$2</span>");  // colors built-in JavaScript objects
-				hlHTML = hlHTML.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|Infinity|null|undefined)(?=\W)/g,
-					"$1<span class='highlighting' style='color:" + valueColor + "'>$2</span>");  // colors some values
-				hlHTML = hlHTML.replace(/(<span.+?>)|(".*?"|'.*?')/g, function (match, tag, str) {  // colors strings
-					if (match == tag) {  // prevents putting spans within spans
-						return tag;
-					} else if (match == str) {
-						return "<span class='highlighting' style='color:" + quoteColor + "'>" + str + "</span>";
-					}
-				});
-				hlHTML = hlHTML.replace(/\/\*[^]*?\*\/|\/\/.*/g, "<span class='highlighting' style='color:" + commentColor + "'>$&</span>");  // colors comments
+			function highlightJavaScript(script, classes) {
+				if (classes && classes.includes("comment")) {
+					script = script.replace(/^[^]*$/g, "<span class='highlighting comment'>$&</span>");  // colors comments
+				} else {
+					script = script.replace(/(\W)(var|let|const|function\*?|return|if|else|switch|case|default|break|continue|while|do|for|in|of|delete|try|catch|finally|new|yield\*?|typeof|instanceof|throw|async|await|class)(?= |\(|\{|:|;)/g,
+						"$1<span class='highlighting keyword'>$2</span>");  // colors JavaScript keywords
+					script = script.replace(/(\W)(window|document|this|Math|Number|Object|JSON|String|Array|Promise|Event|Date|Error|TypeError|ReferenceError|alert|prompt|console|performance|Storage|sessionStorage|localStorage|setTimeout|setInterval|clearTimeout|clearInterval|URL|FileReader|XMLHttpRequest|encodeURIComponent|decodeURIComponent|dispatchEvent|arguments|opener|self)(?= |\.|\()/g,
+						"$1<span class='highlighting built-in'>$2</span>");  // colors built-in JavaScript objects
+					script = script.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|Infinity|null|undefined)(?=\W)/g,
+						"$1<span class='highlighting value'>$2</span>");  // colors some values
+					script = script.replace(/(<span.+?>)|("(?:(?:<\/?span.+?>)|[^<>\n\r])*?"|'(?:(?:<\/?span.+?>)|[^<>\n\r])*?')/g, function (match, tag, str) {  // colors strings
+						if (match == tag) {  // prevents putting spans within spans
+							return tag;
+						} else if (match == str) {
+							return "<span class='highlighting quote'>" + str + "</span>";
+						}
+					});
+					script = script.replace(/([^/\\])(\/\*[^]*?\*\/|\/\/.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
+				}
+				return script;
+			}
+			function highlightCSS(hlHTML, classes) {
+				if (classes && classes.includes("comment")) {
+					hlHTML = hlHTML.replace(/^[^]*$/g, "<span class='highlighting comment'>$&</span>");  // colors comments
+				} else {
+					hlHTML = hlHTML.replace(/.+(?=:)/g, "<span class='highlighting CSS-property'>$&</span>");  // colors CSS properties
+					hlHTML = hlHTML.replace(/.+(?= ?\{)/g, function (match) {
+						if (match.includes("@")) {  // "@" won't be at the beginning
+							return "<span class='highlighting CSS-at-rule'>" + match + "</span>";  // colors nesting CSS at-rules
+						} else {
+							return "<span class='highlighting CSS-selector'>" + match + "</span>";  // colors CSS selectors
+						}
+					});
+					hlHTML = hlHTML.replace(/@.+;/g, "<span class='highlighting CSS-at-rule'>$&</span>");  // colors single line CSS at-rules
+					hlHTML = hlHTML.replace(/\/\*[^]*?\*\//g, "<span class='highlighting comment'>$&</span>");  // colors comments
+				}
 				return hlHTML;
 			}
-			function highlightCSS(hlHTML) {
-				let propertyColor = "lightgreen";
-				let selectorColor = "yellow";
-				let commentColor = "green";
-				hlHTML = hlHTML.replace(/.+(?=:)/g, "<span class='highlighting' style='color:" + propertyColor + "'>$&</span>");  // colors CSS properties
-				hlHTML = hlHTML.replace(/.+(?= ?\{)/g, "<span class='highlighting' style='color:" + selectorColor + "'>$&</span>");  // colors CSS selectors
-				hlHTML = hlHTML.replace(/\/\*[^]*?\*\//g, "<span class='highlighting' style='color:" + commentColor + "'>$&</span>");  // colors comments
-				return hlHTML;
-			}
-			function highlightWebsite(hlHTML) {
+			function highlightWebsite(hlHTML, classes) {
 				hlHTML = hlHTML.replace(/\&lt;script\&gt;[^]*?\&lt;\/script\&gt;|\&lt;style\&gt;[^]*?\&lt;\/style\&gt;|\&lt;[^]+?\&gt;|\&amp;[^;& \n]+?;/g, function (match) {
 					if (match.slice(0, 10) == "&lt;script") {
 						return highlightJavaScript(match);
@@ -139,21 +147,96 @@
 						return highlightHTML(match);
 					}
 				});
-				hlHTML = hlHTML.replace(/\&lt;\/?(?:script|style).*?\&gt;/g, function (match) {  // colors the <script> and <style> tags
+				hlHTML = hlHTML.replace(/\&lt;\/?(?:script|style)[^+\n\r]*?\&gt;/g, function (match) {  // colors the <script> and <style> tags
 					return highlightHTML(match);
 				});
 				return hlHTML;
 			}
+			function highlightPython(script, classes) {
+				if (classes && classes.includes("comment")) {
+					script = script.replace(/^[^]*$/g, "<span class='highlighting comment'>$&</span>");  // colors comments
+				} else {
+					script = script.replace(/(\W)(from|import|as|def|return|if|else|elif|and|or|not|break|pass|while|do|for|in|del|class|try|except|finally|global|raise|lambda)(?= |\(|\{|:|\n|$)/g,
+						"$1<span class='highlighting keyword'>$2</span>");  // colors Python keywords
+					script = script.replace(/(\W)(len|int|float|str|range|open|print|hex|round|any|type|eval|Exception|__init__)(?= |\.|\(|\)|\n|$)/g,
+						"$1<span class='highlighting built-in'>$2</span>");  // colors built-in Python objects
+					script = script.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|True|False)(?=\W|\n|$)/g,
+						"$1<span class='highlighting value'>$2</span>");  // colors some values
+					script = script.replace(/'''[^]*?'''|"""[^]*?"""|#.*/g, "<span class='highlighting comment'>$&</span>");  // colors comments
+					script = script.replace(/(<span.+?>)|("(?:(?:<\/?span.+?>)|[^<>\n\r])*?"|'(?:(?:<\/?span.+?>)|[^<>\n\r])*?')/g, function (match, tag, str) {  // colors strings  //// needs to account for comments
+						if (match == tag) {  // prevents putting spans within spans
+							return tag;
+						} else if (match == str) {
+							return "<span class='highlighting quote'>" + str + "</span>";
+						}
+					});
+				}
+				return script;
+			}
+			function highlightGeneric(script, classes) {
+				if (classes && classes.includes("comment")) {
+					script = script.replace(/^[^]*$/g, "<span class='highlighting comment'>$&</span>");  // colors comments
+				} else {
+					script = script.replace(/(\W)(return|pass|if|else|switch|case|default|break|continue|while|do|for|in|of|try|catch|except|finally|new|class|import)(?= |\(|\{|:|;|\n|$)/gi,
+						"$1<span class='highlighting keyword'>$2</span>");  // colors generic keywords
+					script = script.replace(/(\W)(function|func|number|object|json|string|str|integer|int|double|float|boolean|bool|byte|short|long|void|array|promise|event|error|typeerror|referenceerror|self)(?= |\.|\(|\n|$)/gi,
+						"$1<span class='highlighting built-in'>$2</span>");  // colors generic objects
+					script = script.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|infinity|infin)(?=\W|\n|$)/gi,
+						"$1<span class='highlighting value'>$2</span>");  // colors some values
+					script = script.replace(/(<span.+?>)|("(?:(?:<\/?span.+?>)|[^<>\n\r])*?"|'(?:(?:<\/?span.+?>)|[^<>\n\r])*?')/g, function (match, tag, str) {  // colors strings
+						if (match == tag) {  // prevents putting spans within spans
+							return tag;
+						} else if (match == str) {
+							return "<span class='highlighting quote'>" + str + "</span>";
+						}
+					});
+					script = script.replace(/([^/\\])(\/\*[^]*?\*\/|\/\/.*|#.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
+				}
+				return script;
+			}
 			function highlightLine(line) {
 				if (line.className.includes("HTML")) {
-					return highlightHTML(line.textContent);
+					return highlightHTML(line.textContent, line.className);
 				} else if (line.className.includes("JavaScript")) {
-					return highlightJavaScript(line.textContent);
+					return highlightJavaScript(line.textContent, line.className);
 				} else if (line.className.includes("CSS")) {
-					return highlightCSS(line.textContent);
+					return highlightCSS(line.textContent, line.className);
+				} else if (line.className.includes("Python")) {
+					return highlightPython(line.textContent, line.className);
+				} else if (line.className.includes("General")) {
+					return highlightGeneral(line.textContent, line.className);
 				} else {
 					//// error
 				}
+			}
+
+			function updateLineNumbers() {
+				let selectedLines = [];
+				S.forEach(S.getClass("line-number"), function (num) {
+					if (num.className.includes("selected")) {
+						selectedLines.push(Number(num.textContent));
+					}
+				});
+				S.getId("lineNumbers").innerHTML = "";
+				let newLines = "";
+				S.forEach(S.getId("codeDisplay").children, function (_, index) {
+					if (selectedLines.includes(index + 1)) {
+						newLines += "<section class='line-number selected'>" + (index + 1) + "</section>";
+					} else {
+						newLines += "<section class='line-number'>" + (index + 1) + "</section>";
+					}
+				});
+				S.getId("lineNumbers").innerHTML = newLines;
+				// allows highlighting line numbers
+				S.forEach(S.getClass("line-number"), function (num) {
+					num.addEventListener("click", function () {
+						if (this.className.includes("selected")) {
+							this.className = "line-number";
+						} else {
+							this.className += " selected";
+						}
+					});
+				});
 			}
 
 			function updateCode(updateLines) {
@@ -162,7 +245,22 @@
 				clearTimeout(highlightTimeout);
 				highlightTimeout = setTimeout(function () {  // prevents performance issues from needing to refresh so much so often
 					if (S.getId("highlightOption").checked) {
-						hlHTML = highlightWebsite(hlHTML);
+						switch (projectLanguage) {
+							case "HTML":
+								hlHTML = highlightWebsite(hlHTML);
+								break;
+							case "CSS":
+								hlHTML = highlightCSS(hlHTML);
+								break;
+							case "JavaScript":
+								hlHTML = highlightJavaScript(hlHTML);
+								break;
+							case "Python":
+								hlHTML = highlightPython(hlHTML);
+								break;
+							default:
+								hlHTML = highlightGeneric(hlHTML);
+						}
 					}
 					S.getId("codeHighlighter").innerHTML = hlHTML;
 					if (updateLines) {
@@ -197,6 +295,86 @@
 						});
 					}
 				}, 100);
+			}
+
+			function divideLineBreaks(codeElement) {
+				/**
+				takes an HTML element containing code with line breaks and turns it into one <section> for each line
+				*/
+				// makes sure the caret position isn't lost if inside the code element
+				let caretPosition = null;
+				let selection = window.getSelection();
+				selection.collapseToEnd();
+				let selectedElement;  ////
+				let selectedSection;  //// clean up the stuff that uses this
+				if (selection.focusNode && codeElement.contains(selection.focusNode)) {  // if the caret exists in the element being divided
+					selectedElement = selection.focusNode.parentElement;
+					selectedSection = selectedElement;
+					while (selectedSection.tagName != "SECTION" && selectedSection.tagName != "HTML") {
+						selectedSection = selectedSection.parentElement;
+					}
+					if (selectedSection == codeElement) {  // if the caret is in the element being divided
+						caretPosition = selection.focusOffset;
+					}
+				}
+				// puts the text between line breaks into their own elements
+				S.forEach(codeElement.getElementsByTagName("br"), function (br) {
+					br.outerHTML = "\n";
+				});
+				let lineList = [];  // holds a list of all of the new lines created
+				let originalSection;  // hangs onto the beginning of the code to make sure the caret position can be properly set
+				S.forEach(codeElement.innerHTML.split(/\n\r?|\r/g), function (line, index) {
+					let section = document.createElement("section");
+					section.className = codeElement.className;
+					section.innerHTML = line;
+					codeElement.parentNode.insertBefore(section, codeElement);  // inserting before maintains the same order
+					lineList.push(section);
+					if (index == 0) {
+						originalSection = section;
+					}
+				});
+				codeElement.parentNode.removeChild(codeElement);
+				// puts the caret in the correct spot
+				if (caretPosition !== null) {
+					while (caretPosition > originalSection.textContent.length) {
+						caretPosition -= originalSection.textContent.length;
+						originalSection = originalSection.nextSibling;
+					}
+					let newRange = document.createRange();
+					newRange.setStart(originalSection, caretPosition);
+					newRange.collapse(true);
+					selection.removeAllRanges();
+					selection.addRange(newRange);
+				}
+				// returns a list of all of the new lines created
+				return lineList;
+			}
+
+			function updateCodeLine(textLine, checkForLineBreaks) {
+				let highlightedLine = S.getId("codeHighlighter").children[textLine.parentElement.children.indexOf(textLine)];  // finds the corresponding element in the code highlighter
+				let code = S.getId("codeHighlighter").innerHTML;  // highlighted HTML (doesn't make the page repeatedly rerender)
+				clearTimeout(highlightTimeout);
+				highlightTimeout = setTimeout(function () {  // prevents performance issues from needing to refresh so much so often
+
+				}, 100);
+			}
+
+			function addAsSections(code) {
+				let textContainer = S.getId("codeDisplay");
+				textContainer.innerHTML = "";
+				let section = document.createElement("section");
+				section.className = projectLanguage;
+				section.textContent = code;
+				textContainer.appendChild(section);
+				let highlighting = S.getId("codeHighlighter");
+				highlighting.innerHTML = "";
+				S.forEach(divideLineBreaks(section), function (line) {
+					let hl = document.createElement("section");  // highlighted line
+					hl.className = "highlighting " + line.className;
+					hl.innerHTML = highlightLine(line);
+					highlighting.appendChild(hl);
+				});
+				updateLineNumbers();
 			}
 
 
@@ -469,7 +647,26 @@
 				new Promise(function () {
 					S.getFile(S.getId("codeURL").value, function (contents) {
 						S.getId("codeDisplay").textContent = contents;
+						// attempts to figure out which language the code is written in
+						switch (S.getId("codeURL").value.slice(S.getId("codeURL").value.lastIndexOf(".") + 1)) {
+							case "html":
+								projectLanguage = "HTML";
+								break;
+							case "css":
+								projectLanguage = "CSS";
+								break;
+							case "js":
+								projectLanguage = "JavaScript";
+								break;
+							case "py":
+								projectLanguage = "Python";
+								break;
+							default:
+								projectLanguage = "HTML";
+						}
+						S.getId("codeLanguage").value = projectLanguage;
 						updateCode(true);
+						//// addAsSections(contents);
 					}, false);
 				}).catch(function (error) {
 					console.error("The file couldn't be retrieved.");
@@ -480,6 +677,11 @@
 
 			S.listen("projectName", "change", function () {
 				projectName = encodeURIComponent(this.value.trim());
+			});
+
+			S.listen("codeLanguage", "change", function () {
+				projectLanguage = this.value;
+				updateCode();
 			});
 
 			S.listen("loadProject", "click", function () {
@@ -493,6 +695,8 @@
 						S.makeDialog("No project exists with that name.");
 					} else {
 						S.getId("codeDisplay").textContent = project.code;
+						projectLanguage = project.language;
+						S.getId("codeLanguage").value = projectLanguage;
 						updateCode(true);
 					}
 				}
@@ -506,7 +710,7 @@
 				} else {
 					let project = {};
 					project.code = S.getId("codeDisplay").textContent;
-					project.language = "HTML";
+					project.language = projectLanguage;
 					project.lastUpdated = new Date().getTime();
 					M.local.store(projectName + "/", project);
 					M.session.store(projectName + "/", project);
@@ -618,7 +822,7 @@
 					let beforeNewLine = this.textContent.slice(0, range.startOffset);
 					if (beforeNewLine.length > 1) {
 						beforeNewLine = beforeNewLine.slice(-2);
-						if (beforeNewLine == ",," && event.key == ",") {
+						if (beforeNewLine == ",," && event.key == ",") {  // if typing ",,," to have a tab inserted
 							event.preventDefault();
 							this.textContent = this.textContent.slice(0, range.startOffset-2) + "\t" + this.textContent.slice(range.endOffset);  // replaces ",,," with "\t"
 							// puts the caret in the correct spot
@@ -859,6 +1063,47 @@
 				display: block;
 				margin: 1em auto;
 			}
+
+			.highlighting.tag-name {
+				color: blue;
+			}
+			.highlighting.outer-tag {
+				color: darkcyan;
+			}
+			.highlighting.tag-extras {
+				color: cyan;
+			}
+			.highlighting.HTML-char {
+				color: lightgreen;
+			}
+			.highlighting.CSS-selector {
+				color: yellow;
+			}
+			.highlighting.CSS-at-rule {
+				color: cyan;
+			}
+			.highlighting.CSS-property {
+				color: lightgreen;
+			}
+			.highlighting.keyword {
+				color: blue;
+			}
+			.highlighting.built-in {
+				color: orange;
+			}
+			.highlighting.value {
+				color: lightblue;
+			}
+			.highlighting.quote {
+				color: indianred;
+			}
+			.highlighting.comment {
+				color: green;
+			}
+			.highlighting .highlighting {
+				color: inherit !important;
+			}
+
 			#codeContainer {
 				position: relative;
 				width: 100%;
@@ -870,15 +1115,19 @@
 			}
 			#codeHighlighter, #codeDisplay {
 				position: absolute;
-				left: 3em;
+				left: 4em;
 				top: 0em;
-				min-width: calc(100% - 3em);
+				min-width: calc(100% - 4em);
 				min-height: 100%;
 				tab-size: 4;
 				text-align: left;
 				white-space: pre;
 				font-family: monospace;
 				outline: none;
+			}
+			#codeHighlighter section, #codeDisplay section {
+				margin: 0em;
+				text-align: left;
 			}
 			#codeHighlighter {
 				color: white;
@@ -896,14 +1145,12 @@
 				left: 0em;
 				z-index: 1;
 				border-right: .05em solid gray;
-				width: 3em;
+				padding-right: .5em;
+				width: 3.5em;
 				min-height: 100%;
 				background: black;
 				color: white;
 				text-align: right;
-			}
-			.highlighting .highlighting {
-				color: inherit !important;
 			}
 			.editable-code-line, .highlighted-code-line {
 				display: block;
@@ -1111,6 +1358,14 @@
 				</button>
 				<br>
 				<input type="text" id="projectName" placeholder="Project name">
+				<br>
+				<select id="codeLanguage">
+					<option value="HTML" selected>HTML</option>
+					<option value="CSS">CSS</option>
+					<option value="JavaScript">JavaScript</option>
+					<option value="Python">Python</option>
+					<option value="Other">Other</option>
+				</select>
 				<br>
 				<button id="loadProject">
 					Load
