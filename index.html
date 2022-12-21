@@ -116,7 +116,7 @@
 							return "<span class='highlighting quote'>" + str + "</span>";
 						}
 					});
-					script = script.replace(/([^/\\])(\/\*[^]*?\*\/|\/\/.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
+					script = script.replace(/(^|[^/\\])(\/\*[^]*?\*\/|\/\/.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
 				}
 				return script;
 			}
@@ -177,7 +177,7 @@
 				if (classes && classes.includes("comment")) {
 					script = script.replace(/^[^]*$/g, "<span class='highlighting comment'>$&</span>");  // colors comments
 				} else {
-					script = script.replace(/(\W)(return|pass|if|else|switch|case|default|break|continue|while|do|for|in|of|try|catch|except|finally|new|class|import)(?= |\(|\{|:|;|\n|$)/gi,
+					script = script.replace(/(\W)(return|pass|if|else|switch|case|default|break|continue|while|do|for|in|of|try|catch|except|finally|new|class|import|include|use|using)(?= |\(|\{|:|;|\n|$)/gi,
 						"$1<span class='highlighting keyword'>$2</span>");  // colors generic keywords
 					script = script.replace(/(\W)(function|func|number|object|json|string|str|integer|int|double|float|boolean|bool|byte|short|long|void|array|promise|event|error|typeerror|referenceerror|self)(?= |\.|\(|\n|$)/gi,
 						"$1<span class='highlighting built-in'>$2</span>");  // colors generic objects
@@ -190,7 +190,8 @@
 							return "<span class='highlighting quote'>" + str + "</span>";
 						}
 					});
-					script = script.replace(/([^/\\])(\/\*[^]*?\*\/|\/\/.*|#.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
+					script = script.replace(/#\w+/g, "<span class='highlighting directive'>$&</span>");  // colors directives
+					script = script.replace(/(^|[^/\\])(\/\*[^]*?\*\/|\/\/.*|#\s.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
 				}
 				return script;
 			}
@@ -294,7 +295,7 @@
 							});
 						});
 					}
-				}, 100);
+				}, 200);
 			}
 
 			function divideLineBreaks(codeElement) {
@@ -350,7 +351,7 @@
 				return lineList;
 			}
 
-			function updateCodeLine(textLine, checkForLineBreaks) {
+			function updateCodeLine(textLine, checkForLineBreaks) {  ////
 				let highlightedLine = S.getId("codeHighlighter").children[textLine.parentElement.children.indexOf(textLine)];  // finds the corresponding element in the code highlighter
 				let code = S.getId("codeHighlighter").innerHTML;  // highlighted HTML (doesn't make the page repeatedly rerender)
 				clearTimeout(highlightTimeout);
@@ -763,7 +764,7 @@
 			});
 
 			S.listen("codeDisplay", "keydown", function (event) {
-				if (event.key == "Enter") {
+				if (event.key == "Enter" || event.keyCode == 13) {
 					/*
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -868,10 +869,10 @@
 				let selection = window.getSelection();
 				let range = selection.getRangeAt(0);
 				let offset = range.startOffset;
-				if (key == "Unidentified") {  // happens on mobile
+				if (key == "Unidentified") {  // happens on mobile?
 					key = this.textContent.slice(offset - 1, offset);
 				}
-				if (key == "Enter" || key == "Backspace") {
+				if (key == "Enter" || event.keyCode == 13 || key == "Backspace") {
 					updateCode(true);
 				} else if (key == "," /*|| key == "."*/) {
 					if (this.textContent.slice(offset - 3, offset) == ",,,") {
@@ -1096,6 +1097,9 @@
 			}
 			.highlighting.quote {
 				color: indianred;
+			}
+			.highlighting.directive {
+				color: yellow
 			}
 			.highlighting.comment {
 				color: green;
