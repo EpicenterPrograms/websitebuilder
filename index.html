@@ -179,9 +179,9 @@
 				} else {
 					script = script.replace(/(\W)(return|pass|if|else|switch|case|default|break|continue|while|do|for|in|of|try|catch|except|finally|new|class|import|include|use|using)(?= |\(|\{|:|;|\n|$)/gi,
 						"$1<span class='highlighting keyword'>$2</span>");  // colors generic keywords
-					script = script.replace(/(\W)(function|func|number|object|json|string|str|integer|int|double|float|boolean|bool|byte|short|long|void|array|promise|event|error|typeerror|referenceerror|self)(?= |\.|\(|\n|$)/gi,
+					script = script.replace(/(\W)(function|func|number|object|json|string|str|char|integer|int|double|float|boolean|bool|byte|short|long|const|void|signed|unsigned|array|promise|event|error|typeerror|referenceerror|self|sizeof)(?= |\.|\(|\n|$)/gi,
 						"$1<span class='highlighting built-in'>$2</span>");  // colors generic objects
-					script = script.replace(/(\W)(-?\d+\.?\d*|-?\.\d+|true|false|NaN|infinity|infin)(?=\W|\n|$)/gi,
+					script = script.replace(/(\W)(-?\d+\.?\d*(?:e-?\d+)?|-?\.\d+(?:e-?\d+)?|true|false|NaN|infinity|infin|on|off)(?=\W|\n|$)/gi,
 						"$1<span class='highlighting value'>$2</span>");  // colors some values
 					script = script.replace(/(<span.+?>)|("(?:(?:<\/?span.+?>)|[^<>\n\r])*?"|'(?:(?:<\/?span.+?>)|[^<>\n\r])*?')/g, function (match, tag, str) {  // colors strings
 						if (match == tag) {  // prevents putting spans within spans
@@ -190,7 +190,7 @@
 							return "<span class='highlighting quote'>" + str + "</span>";
 						}
 					});
-					script = script.replace(/#\w+/g, "<span class='highlighting directive'>$&</span>");  // colors directives
+					script = script.replace(/#\w+|#<.+?>\w+?<\/.+?>/g, "<span class='highlighting directive'>$&</span>");  // colors directives
 					script = script.replace(/(^|[^/\\])(\/\*[^]*?\*\/|\/\/.*|#\s.*)/g, "$1<span class='highlighting comment'>$2</span>");  // colors comments
 				}
 				return script;
@@ -764,7 +764,7 @@
 			});
 
 			S.listen("codeDisplay", "keydown", function (event) {
-				if (event.key == "Enter" || event.keyCode == 13) {
+				if (event.key == "Enter") {
 					/*
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -785,7 +785,7 @@
 					let offset = range.startOffset;
 					let beforeNewLine = this.textContent.slice(0, range.startOffset);
 					let tabs = "";
-					if (beforeNewLine.lastIndexOf("\n") < range.startOffset) {
+					if (beforeNewLine.lastIndexOf("\n") < range.startOffset) {  // if there are tabs preceeding the current line
 						tabs = beforeNewLine.slice(beforeNewLine.lastIndexOf("\n")).match(/\t+/);
 						if (tabs === null) {
 							tabs = "";
@@ -872,7 +872,10 @@
 				if (key == "Unidentified") {  // happens on mobile?
 					key = this.textContent.slice(offset - 1, offset);
 				}
-				if (key == "Enter" || event.keyCode == 13 || key == "Backspace") {
+				if (key == "Enter") {
+					event.preventDefault();
+					updateCode(true);
+				} else if (key == "Backspace") {
 					updateCode(true);
 				} else if (key == "," /*|| key == "."*/) {
 					if (this.textContent.slice(offset - 3, offset) == ",,,") {
@@ -892,6 +895,7 @@
 			S.listen("codeDisplay", "paste", function () {
 				setTimeout(function () {  // wait until the contents are actually pasted
 					updateCode(true);
+					updateLineNumbers();
 				}, 0);
 			});
 
