@@ -764,7 +764,8 @@
 			});
 
 			S.listen("codeDisplay", "keydown", function (event) {
-				if (event.key == "Enter") {
+				if (event.key == "Enter" || event.keyCode == 13) {
+					console.log("Enter was pressed.");
 					/*
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -872,10 +873,7 @@
 				if (key == "Unidentified") {  // happens on mobile?
 					key = this.textContent.slice(offset - 1, offset);
 				}
-				if (key == "Enter") {
-					event.preventDefault();
-					updateCode(true);
-				} else if (key == "Backspace") {
+				if (key == "Enter" || key == "Backspace") {
 					updateCode(true);
 				} else if (key == "," /*|| key == "."*/) {
 					if (this.textContent.slice(offset - 3, offset) == ",,,") {
