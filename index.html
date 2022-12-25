@@ -759,13 +759,23 @@
 			});
 
 
+			/*  ////
+			S.listen("undo", "click", function () {
+				document.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true })).call(S.getId("codeDisplay"));
+			});
+			S.listen("redo", "click", function () {
+				S.getId("codeDisplay").focus();
+				document.dispatchEvent(new KeyboardEvent("keydown", { key: "y", ctrlKey: true }));
+			});
+			*/
+
+
 			S.listen("highlightOption", "change", function () {
 				updateCode();
 			});
 
 			S.listen("codeDisplay", "keydown", function (event) {
 				if (event.key == "Enter") {
-					console.log("Enter was pressed.");
 					/*
 					event.preventDefault();
 					let selection = window.getSelection();
@@ -833,18 +843,9 @@
 							newRange.collapse(true);
 							selection.removeAllRanges();
 							selection.addRange(newRange);
-						} else if (beforeNewLine == ",," && event.key == ".") {
+						} else if (beforeNewLine == ".." && event.key == ",") {
 							event.preventDefault();
-							this.textContent = this.textContent.slice(0, range.startOffset-2) + "<" + this.textContent.slice(range.endOffset);  // replaces ",,." with "<"
-							// puts the caret in the correct spot
-							let newRange = document.createRange();
-							newRange.setStart(this.childNodes[0], offset - 1);
-							newRange.collapse(true);
-							selection.removeAllRanges();
-							selection.addRange(newRange);
-						} else if (beforeNewLine == ".," && event.key == ",") {
-							event.preventDefault();
-							this.textContent = this.textContent.slice(0, range.startOffset-2) + "/" + this.textContent.slice(range.endOffset);  // replaces ".,," with "/"
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + "<" + this.textContent.slice(range.endOffset);  // replaces "..," with "<"
 							// puts the caret in the correct spot
 							let newRange = document.createRange();
 							newRange.setStart(this.childNodes[0], offset - 1);
@@ -853,10 +854,41 @@
 							selection.addRange(newRange);
 						} else if (beforeNewLine == ",." && event.key == ".") {
 							event.preventDefault();
-							this.textContent = this.textContent.slice(0, range.startOffset-2) + ">" + this.textContent.slice(range.endOffset);  // replaces ",.." with ">"
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + "/" + this.textContent.slice(range.endOffset);  // replaces ",.." with "/"
 							// puts the caret in the correct spot
 							let newRange = document.createRange();
 							newRange.setStart(this.childNodes[0], offset - 1);
+							newRange.collapse(true);
+							selection.removeAllRanges();
+							selection.addRange(newRange);
+						} else if (beforeNewLine == ",," && event.key == ".") {
+							event.preventDefault();
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + ">" + this.textContent.slice(range.endOffset);  // replaces ",,." with ">"
+							// puts the caret in the correct spot
+							let newRange = document.createRange();
+							newRange.setStart(this.childNodes[0], offset - 1);
+							newRange.collapse(true);
+							selection.removeAllRanges();
+							selection.addRange(newRange);
+						} else if (beforeNewLine == ",." && event.key == ",") {  // replaces ",.," with a new line (for problems with mobile)
+							event.preventDefault();
+							beforeNewLine = this.textContent.slice(0, range.startOffset);
+							let tabs = "";
+							if (beforeNewLine.lastIndexOf("\n") < range.startOffset) {  // if there are tabs preceeding the current line
+								tabs = beforeNewLine.slice(beforeNewLine.lastIndexOf("\n")).match(/\t+/);
+								if (tabs === null) {
+									tabs = "";
+								} else {
+									tabs = tabs[0];
+								}
+								if (["{", "[", "(", ":"].includes(S.itemAt(beforeNewLine, -3)) || S.itemAt(beforeNewLine, -3) == ">" && !beforeNewLine.slice(beforeNewLine.lastIndexOf("<")).includes("/")) {  // if the new line comes after one of the items in the array or an opening HTML tag
+									tabs += "\t";
+								}
+							}
+							this.textContent = this.textContent.slice(0, range.startOffset-2) + "\n" + tabs + this.textContent.slice(range.endOffset);
+							// puts the caret in the correct spot
+							let newRange = document.createRange();
+							newRange.setStart(this.childNodes[0], offset + tabs.split("\t").length - 2);
 							newRange.collapse(true);
 							selection.removeAllRanges();
 							selection.addRange(newRange);
@@ -1387,6 +1419,15 @@
 				<button id="listProjects">
 					List projects
 				</button>
+				<!--
+				<br>
+				<button id="undo">
+					Undo
+				</button>
+				<button id="redo">
+					Redo
+				</button>
+				-->
 			</div>
 			<br>
 			<input type="checkbox" id="highlightOption" checked>
