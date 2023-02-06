@@ -5,6 +5,13 @@
 			Website Builder
 		</title>
 		<base target="_blank">
+		<script>
+			var Standards = {
+				general: {
+					options: { console: "recorded" }
+				}
+			};
+		</script>
 		<script src="https://epicenterprograms.github.io/standards/behavior/general.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/4.6.1/firebase-firestore.js"></script>
@@ -56,9 +63,9 @@
 					log = log.replace(/>/g, "&gt;");
 					log = log.replace(/\n/g, "<br>");
 					log = log.replace(/\//g, "<wbr>/");
-					log = log.replace(/Warning \{[^]+?\}/g, "<span style='color:orange'>$&</span>");
-					log = log.replace(/Error \{[^]+?\}/g, "<span style='color:red'>$&</span>");
-					log = log.replace(/Info \{[^]+?\}/g, "<span style='color:blue'>$&</span>");
+					log = log.replace(/Warning.+\{[^]+?\}/g, "<span style='color:orange'>$&</span>");
+					log = log.replace(/Error.+\{[^]+?\}/g, "<span style='color:red'>$&</span>");
+					log = log.replace(/Info.+\{[^]+?\}/g, "<span style='color:blue'>$&</span>");
 					document.getElementById("consoleOutput").innerHTML = log;
 				});
 
