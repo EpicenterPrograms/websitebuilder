@@ -964,6 +964,28 @@
 				if (S.getType(M.local.recall("last synchronized")) == "Error") {
 					M.local.store("last synchronized", -Infinity);
 				}
+				/*
+				let syncTime = new Date().getTime();
+				M.server.mergeData(
+					function () {
+
+					},
+					function () {
+
+					},
+					"",
+					"",
+					{ ignoreInLocal: ["last viewed"], ignoreInServer: ["last synchronized"] }
+				).then(function () {
+					M.local.store("last synchronized", syncTime);
+					S.makeDialog("Account data was synchronized.");
+				}).catch(function (error) {
+					S.makeDialog("There was a problem retrieving your account's information.");
+					console.error("Synchronization failed");
+					console.error(error);
+				});
+				*/
+				//*
 				let localSync = M.local.recall("last synchronized");
 				M.server.recall("last synchronized", function (serverSync) {
 					M.server.list("./", function (serverProjects) {  // lists all of the user's projects (only the titles)
@@ -986,7 +1008,7 @@
 						let syncTime = new Date().getTime();
 						M.local.store("last synchronized", syncTime);
 						remaining.value++;
-						M.server.store("last synchronized", syncTime, function () { remaining.value--; });
+						M.server.store("last synchronized", syncTime).then(function () { remaining.value--; });
 						let localProjects = M.local.list("./", { shallowKeyList: true });
 						S.forEach(serverProjects, function (name) {
 							if (name != "last synchronized") {
@@ -1006,7 +1028,7 @@
 										M.local.store(name + "/", project);
 										remaining.value--;
 									} else if (M.local.recall(name + "/").lastUpdated > project.lastUpdated) {
-										M.server.store(name + "/", M.local.recall(name + "/"), function () {
+										M.server.store(name + "/", M.local.recall(name + "/")).then(function () {
 											remaining.value--;
 										});
 									} else {  // if the local version and the server version are the same
@@ -1022,7 +1044,7 @@
 								let item = M.local.recall(name + "/");
 								if (item.lastUpdated > localSync) {
 									remaining.value++;
-									M.server.store(name + "/", item, function () {
+									M.server.store(name + "/", item).then(function () {
 										remaining.value--;
 									});
 								} else {
@@ -1037,6 +1059,7 @@
 					console.error("Synchronization failed");
 					console.error(error);
 				});
+				//*/
 			}
 
 			firebase.auth().onAuthStateChanged(function (person) {
