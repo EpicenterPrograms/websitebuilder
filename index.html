@@ -988,7 +988,7 @@
 				//*
 				let localSync = M.local.recall("last synchronized");
 				M.server.recall("last synchronized", function (serverSync) {
-					M.server.list("./", function (serverProjects) {  // lists all of the user's projects (only the titles)
+					M.server.list("./", { shallowKeyList: true }).then(function (serverProjects) {  // lists all of the user's project titles
 						let remaining = new S.Listenable();
 						remaining.value = 1;
 						remaining.addEventListener("set", function (value) {
@@ -1053,7 +1053,7 @@
 							}
 						});
 						remaining.value--;
-					}, { shallowKeyList: true });
+					});
 				}).catch(function (error) {
 					S.makeDialog("There was a problem retrieving your account's information.");
 					console.error("Synchronization failed");
